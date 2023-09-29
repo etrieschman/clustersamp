@@ -29,22 +29,51 @@ def get_random_tree_locs(n_trees, n_groups, std_scale):
 
 tree_locs = get_random_tree_locs(100, 10, 0.5)
 
+# %% 
+# ASSIGN BIOMASS TO TREES
+def get_tree_bm(tree_locs, gamma_shape, gamma_scale, loc_corr, loc_corr_noise_std):
+    # get gamma distributed biomass
+    tree_bm = np.random.gamma(shape=gamma_shape, scale=gamma_scale, size=len(tree_locs))
+    # include correlation with lat/lon, and some noise
+    tree_bm += (tree_locs[:,0]*loc_corr + 
+                tree_locs[:,1]*loc_corr + 
+                np.random.normal(scale=loc_corr_noise_std, size=len(tree_locs)))
+    return tree_bm
+
+tree_bm = get_tree_bm(tree_locs, 3, 2, 0.5, 0.025)
+
 # %%
 # RECORD NOISY TREE LOCATIONS (THESE BECOME OUR CLUSTER LOCATIONS)
-def record_gps_locs(tree_locs, gps_noise):
+def record_noisy_gps_locs(tree_locs, gps_noise):
     cluster_locs = np.zeros(tree_locs.shape)
     for i, tree in enumerate(tree_locs):
         cluster_locs[i] = np.random.multivariate_normal(mean=tree, cov=np.identity(2)*gps_noise)
     return cluster_locs
 
-cluster_locs = record_gps_locs(tree_locs, 0.004)
-
+cluster_locs = record_noisy_gps_locs(tree_locs, 0.004)
 
 # %%
-# visualize
-plt.scatter(x=tree_locs[:,0], y=tree_locs[:,1], alpha=0.75, s=8, label='true tree location')
-plt.scatter(x=cluster_locs[:,0], y=cluster_locs[:,1], alpha=0.5, s=4, label='noisy GPS tree location')
+# VISUALIZE
+plt.scatter(x=tree_locs[:,0], y=tree_locs[:,1], alpha=0.75, s=tree_bm*8, label='true tree location (and size)')
+plt.scatter(x=cluster_locs[:,0], y=cluster_locs[:,1], alpha=0.5, s=8, label='noisy GPS tree location')
 plt.legend()
 plt.title('Tree and cluster locations')
 plt.show()
+
 # %%
+# 0. SAMPLE CLASS
+#    - SAMPLE (is_location_noisy)
+#    - GET MEAN ESTIMATOR
+#    - GET MEAN ESTIMATOR SAMPLE VARIANCE (ANALYTICAL)
+#    - GET MEAN ESTIMATOR SAMPLE VARIANCE (BOOTSTRAP)
+#    A. SAMPLE TYPES
+#       - FOR NOISY AND NON-NOISY LOCATIONS
+#          - ONE-STAGE SRSWR
+#          - ONE-STAGE PPSWR
+#          - TWO-STAGE SRSWR-SRSWR
+#          - TWO-STAGE PPSWR-SRSWR
+#    B. SUB METHODS FOR PPSWR
+#       - CALCULATE INCLUSION PROBABILITIES
+#       - CALCULATE EXPECTED CLUSTER SIZE
+# 1. COMPARISONS TO TRUE MEAN
+#    - PLACEHOLDER

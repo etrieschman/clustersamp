@@ -23,7 +23,6 @@ class Sample:
         self._calculate_sample_variance()
         self._calculate_sample_variance_boot()
         stats = {
-            'true_mean':self.true_mean,
             'sample_mean':self.sample_mean,
             'sample_mean_var': self.sample_mean_variance,
             'sample_mean_var_boot': self.sample_mean_variance_boot
@@ -46,7 +45,7 @@ class SRS(Sample):
         self.n = n
         self.unit_idx_samples = np.random.choice(self.N, size=n, replace=True)
         self.get_stats()
-        return self.unit_idx_samples
+        return {'unit_idxs': self.unit_idx_samples}
 
     def _calculate_sample_mean(self):
         self.sample_mean = self.units[self.unit_idx_samples].mean()
@@ -56,7 +55,8 @@ class SRS(Sample):
 
     def _calculate_sample_variance_boot(self):
         self.sample_mean_variance_boot = np.array(
-            [np.random.choice(self.units[self.unit_idx_samples], size=self.n, replace=True).mean() 
+            [np.random.choice(self.units[self.unit_idx_samples], 
+                              size=self.n, replace=True).mean() 
              for i in range(self.n_bootstraps)]
              ).var() 
         
@@ -79,21 +79,25 @@ class PPSWR_SRS(Sample):
     def sample(self, k):
         self.k = k
         # FIRST STAGE (ppswr) -- get primary unit indices
-        self.punit_idx_samples = np.random.choice(self.N, size=self.k, replace=True, p=self.punit_weights)
-        punit_measurement_locs = record_noisy_gps_locs(self.punit_locs[self.punit_idx_samples], self.gps_error_var)
-        dist = get_distance_matrix(punit_measurement_locs, self.sunit_locs)
-        # SECOND STAGE (SRSWOR / SRSWR)
-        self.sunit_in_punit = (dist < self.measurement_rad) # inclusion mask
-        cluster_size = self.sunit_in_punit.sum(1)
-        cluster_prob = self.sunit_in_punit / cluster_size.reshape((-1,1))
+        self.punit_idx_samples = np.random.choice(
+            self.N, size=self.k, replace=True, p=self.punit_weights)
+        punit_measurement_locs = record_noisy_gps_locs(
+            self.punit_locs[self.punit_idx_samples], self.gps_error_var)
+        # loop first-stage units to get second stage units
         self.sunit_idx_samples = []
-        for i in range(k):
-            self.sunit_idx_samples += [np.random.choice(self.N, size=cluster_size[i], replace=self.replace, p=cluster_prob[i])]
+        for i in range(self.k):
+            dist = get_distance_matrix(punit_measurement_locs[[i]], self.sunit_locs)
+            samples = np.where(dist < self.measurement_rad)[1]
+            self.sunit_idx_samples += [
+                np.random.choice(samples, size=len(samples), replace=self.replace)]
         self.get_stats()
-        return self.punit_idx_samples, self.sunit_idx_samples
+        return {
+            'punit_idxs': self.punit_idx_samples, 
+            'sunit_idxs': self.sunit_idx_samples}
 
     def _calculate_sample_mean(self):
-        self.cluster_mean = np.array([self.units[idxs].mean() for idxs in self.sunit_idx_samples])
+        self.cluster_mean = np.array(
+            [self.units[idxs].mean() if len(idxs) > 0 else 0 for idxs in self.sunit_idx_samples])
         self.sample_mean = self.cluster_mean.mean()
 
     def _calculate_sample_variance(self):
@@ -105,7 +109,8 @@ class PPSWR_SRS(Sample):
             # recalculate mean
             bootstrap_cluster_means = np.array(
                 [np.random.choice(self.units[idxs], size=len(idxs), replace=True).mean()
-                 for idxs in self.sunit_idx_samples])
-            bootstrap_means[i] = bootstrap_cluster_means.mean()
+                 if (len(idxs) != 0) else 0 for idxs in self.sunit_idx_samples])
+            bootstrap_means[i] = np.random.choice(
+                bootstrap_cluster_means, size=self.k, replace=True).mean()
         self.sample_mean_variance_boot = bootstrap_means.var()
         

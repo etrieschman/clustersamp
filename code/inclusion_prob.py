@@ -3,8 +3,8 @@ from scipy.integrate import nquad
 from tqdm import tqdm
 
 # Define parameters
-GPS_ERROR_VARIANCE = 0.004
-MEASUREMENT_RADIUS = 0.5
+GPS_ERROR_VARIANCE = 0.0004
+MEASUREMENT_RADIUS = 0.1
 
 # Define the indicator function
 def indicator_function(xj, yj, xm, ym, R):

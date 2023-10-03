@@ -7,6 +7,7 @@ from make_data import get_random_tree_locs, get_tree_bm, record_noisy_gps_locs
 from sample import SRS, PPSWR_SRS
 from inclusion_prob import GPS_ERROR_VARIANCE, MEASUREMENT_RADIUS
 from inclusion_prob import get_distance_matrix, get_rough_inclusion_probs
+from stats import get_bootsrapped_results, plot_bootstrapped_results
 
 # %%
 # GENERATE DATA AND VISUALIZE
@@ -22,52 +23,21 @@ plt.title('Tree and cluster locations')
 plt.show()
 
 # %%
-# CALCULATE INCLUSION PROBABILITIES
+# CALCULATE INCLUSION PROBABILITIES AND SCALED VALUES
+# get inclusion probabilities
 inc_probs = get_rough_inclusion_probs(cluster_locs, eps=1e-1)
-# CALCULATE EXPECTED VALUE OF CLUSTER SIZE (UNNORMALIZED)
+# calculate expected value of cluster size (UNNORMALIZED)
 EN = inc_probs.sum(0)
 EM = EN.sum()
 EF = inc_probs.sum(1)
-# CALCULATE SCALED VALUES
+# calculate scaled values
 Z = EM / (N*EF) * tree_bm
-
 
 # %%
 # BOOTSTRAP RESULTS FROM SIMPLE RANDOM SAMPLING APPROACH
 srs = SRS(tree_bm, 50)
-n_min = 2
-ns = 100
-n_repeats = 500
-
-def get_bootsrapped_results(sampler, n_min=2, ns=100, n_repeats=500):
-    # arrays to store results
-    means = np.zeros((ns, n_repeats))
-    vars = np.zeros_like(means)
-    vars_boot = np.zeros_like(means)
-
-    # run sampler
-    for i in tqdm(range(ns)):
-        for j in range(n_repeats):
-            sampler.sample(n_min+i)
-            means[i, j] = sampler.sample_mean
-            vars[i, j] = sampler.sample_mean_variance
-            vars_boot[i, j] = sampler.sample_mean_variance_boot
-
-    # plot
-    fig, ax = plt.subplots(nrows=2, sharex=True, figsize=(6, 6))
-    ax[1].boxplot(means.T, patch_artist=False)
-    ax[1].axhline(sampler.true_mean, label='true mean')
-    ax[0].plot(means.var(1), label='bootstrap mean variance')
-    ax[0].plot(vars.mean(1), label='sample mean variance (analytical)')
-    ax[0].plot(vars_boot.mean(1), label='sample mean variance (bootstrap)')
-    ax[1].set_xticks(np.arange(ns, step=10), np.arange(n_min, ns+n_min, step=10))
-    ax[1].set_xlabel('number of samples')
-    ax[1].set_ylabel('distribution of sample means')
-    ax[0].set_ylabel('variance in sample mean')
-    ax[1].legend()
-    ax[0].legend()
-    plt.show()
-
+srs_results = get_bootsrapped_results(srs, n_min=10, ns=50, n_repeats=10)
+plot_bootstrapped_results(true_mean=tree_bm.mean(), results=srs_results, outfile='srs.png')
 
 # %%
 # BOOTSTRAP RESULTS FROM PPSWR-SRSWR SAMPLING APPROACH
@@ -78,36 +48,19 @@ ppswr_srswr = PPSWR_SRS(
     measurement_rad=MEASUREMENT_RADIUS, 
     replace=True, n_bootstraps=50)
 
-ppswr_srswr.sample(5)
-ppswr_srswr.get_stats()
+ppswr_srswr_results = get_bootsrapped_results(ppswr_srswr, n_min=10, ns=50, n_repeats=10)
+plot_bootstrapped_results(true_mean=tree_bm.mean(), results=ppswr_srswr_results, outfile='ppswr_srswr.png')
 
 # %%
-n_min = 2
-ns = 100
-n_repeats = 25
-means = np.zeros((ns, n_repeats))
-vars = np.zeros_like(means)
-vars_boot = np.zeros_like(means)
+# BOOTSTRAP RESULTS FROM PPSWR-SRSWOR SAMPLING APPROACH
+ppswr_srswor = PPSWR_SRS(
+    sunits_scaled=Z, sunit_locs=tree_locs, 
+    punit_weights=EN/EM, punit_locs=cluster_locs, 
+    gps_error_var=GPS_ERROR_VARIANCE, 
+    measurement_rad=MEASUREMENT_RADIUS, 
+    replace=False, n_bootstraps=50)
 
-for i in tqdm(range(ns)):
-    for j in range(n_repeats):
-        ppswr_srswr.sample(n_min+i)
-        means[i, j] = ppswr_srswr.sample_mean
-        vars[i, j] = ppswr_srswr.sample_mean_variance
-        vars_boot[i, j] = ppswr_srswr.sample_mean_variance_boot
+ppswr_srswor_results = get_bootsrapped_results(ppswr_srswor, n_min=10, ns=50, n_repeats=10)
+plot_bootstrapped_results(true_mean=tree_bm.mean(), results=ppswr_srswor_results, outfile='ppswr_srswor.png')
 
-# PLOT
-fig, ax = plt.subplots(nrows=2, sharex=True, figsize=(6, 6))
-ax[1].boxplot(means.T, patch_artist=False)
-ax[1].axhline(ppswr_srswr.true_mean, label='true mean')
-ax[0].plot(means.var(1), label='bootstrap mean variance')
-ax[0].plot(vars.mean(1), label='sample mean variance (analytical)')
-ax[0].plot(vars_boot.mean(1), label='sample mean variance (bootstrap)')
-ax[1].set_xticks(np.arange(ns, step=10), np.arange(n_min, ns+n_min, step=10))
-ax[1].set_xlabel('number of samples')
-ax[1].set_ylabel('distribution of sample means')
-ax[0].set_ylabel('variance in sample mean')
-ax[1].legend()
-ax[0].legend()
-plt.show()
 # %%

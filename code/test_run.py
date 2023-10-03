@@ -36,7 +36,7 @@ Z = EM / (N*EF) * tree_bm
 # %%
 # BOOTSTRAP RESULTS FROM SIMPLE RANDOM SAMPLING APPROACH
 srs = SRS(tree_bm, 50)
-srs_results = get_bootsrapped_results(srs, n_min=10, ns=50, n_repeats=10)
+srs_results = get_bootsrapped_results(srs, n_min=10, ns=50, n_repeats=100)
 plot_bootstrapped_results(true_mean=tree_bm.mean(), results=srs_results, outfile='srs.png')
 
 # %%
@@ -48,7 +48,7 @@ ppswr_srswr = PPSWR_SRS(
     measurement_rad=MEASUREMENT_RADIUS, 
     replace=True, n_bootstraps=50)
 
-ppswr_srswr_results = get_bootsrapped_results(ppswr_srswr, n_min=10, ns=50, n_repeats=10)
+ppswr_srswr_results = get_bootsrapped_results(ppswr_srswr, n_min=10, ns=50, n_repeats=100)
 plot_bootstrapped_results(true_mean=tree_bm.mean(), results=ppswr_srswr_results, outfile='ppswr_srswr.png')
 
 # %%

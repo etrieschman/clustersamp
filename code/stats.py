@@ -33,7 +33,7 @@ def get_bootsrapped_results(sampler:Sample, n_min=2, ns=100, n_repeats=500):
 
     return results
 
-def plot_bootstrapped_results(true_mean, results, outfile=None):
+def plot_bootstrapped_results(true_mean, results, outfile=None, n_tree_ylim=None):
     # plot
     fig, ax = plt.subplots(nrows=3, sharex=True, figsize=(6, 8))
     ax[2].boxplot(results['n_samples'].T, patch_artist=False)
@@ -49,6 +49,8 @@ def plot_bootstrapped_results(true_mean, results, outfile=None):
     ax[2].set_xlabel('n primary samples')
     ax[1].set_ylabel('distribution of sample means')
     ax[2].set_ylabel('n tree measurements')
+    if n_tree_ylim is not None:
+        ax[2].set_ylim(n_tree_ylim)
     ax[0].set_ylabel('variance in sample mean')
     ax[1].legend()
     ax[0].legend()

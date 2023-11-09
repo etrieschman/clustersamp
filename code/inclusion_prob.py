@@ -3,12 +3,12 @@ from scipy.integrate import nquad
 from tqdm import tqdm
 
 # Define parameters
-GPS_ERROR_VARIANCE = 0.0004
+GPS_ERROR_VARIANCE = 5
 MEASUREMENT_RADIUS = 0.1
 
 # Define the indicator function
 def indicator_function(xj, yj, xm, ym, R):
-    return ((xj - xm)**2 + (yj - ym)**22 <= R**2)
+    return ((xj - xm)**2 + (yj - ym)**2 <= R**2)
 
 def normal_distribution(x, mean, cov):
     k = len(x)
@@ -32,6 +32,7 @@ def inclusion_prob(loc_i, loc_j, cov, R, interval):
         ],
         )
     return result
+
 
 def get_inclusion_probs(locs, cov, R, interval=0.005, distance_threshold=100):
     N = len(locs)

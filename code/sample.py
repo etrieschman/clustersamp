@@ -1,7 +1,7 @@
 import numpy as np
 
 from inclusion_prob import get_distance_matrix
-from make_data import record_noisy_gps_locs
+from make_data import record_noisy_gps_locs_gaus, record_noisy_gps_locs_unif
 
 class Sample:
     def __init__(self, units:np.array, n_bootstraps=None):
@@ -62,12 +62,13 @@ class SRS(Sample):
         
 class PPSWR_SRS(Sample):
     def __init__(self, sunits_scaled, sunit_locs, punit_weights, punit_locs, 
-                 gps_error_var, measurement_rad, replace=True, n_bootstraps=None):
+                 gps_error_type, gps_error, measurement_rad, replace=True, n_bootstraps=None):
         super().__init__(sunits_scaled, n_bootstraps)
         self.punit_weights = punit_weights # weights for pps
         self.punit_locs = punit_locs # noisy gps locations
         self.sunit_locs = sunit_locs # true tree locations
-        self.gps_error_var = gps_error_var
+        self.gps_error_type = gps_error_type
+        self.gps_error = gps_error
         self.measurement_rad = measurement_rad
         self.replace = replace
 
@@ -81,8 +82,15 @@ class PPSWR_SRS(Sample):
         # FIRST STAGE (ppswr) -- get primary unit indices
         self.punit_idx_samples = np.random.choice(
             self.N, size=self.k, replace=True, p=self.punit_weights)
-        punit_measurement_locs = record_noisy_gps_locs(
-            self.punit_locs[self.punit_idx_samples], self.gps_error_var)
+        if self.gps_error_type == 'gaus':
+            punit_measurement_locs = record_noisy_gps_locs_gaus(
+                self.punit_locs[self.punit_idx_samples], self.gps_error)
+        elif self.gps_error_type == 'unif':
+            punit_measurement_locs = record_noisy_gps_locs_gaus(
+                self.punit_locs[self.punit_idx_samples], self.gps_error)
+        else:
+            print(f'GPS error type must be one of [gaus, unif], you provided {self.gps_error_type}')
+            return
         # loop first-stage units to get second stage units
         self.sunit_idx_samples = []
         for i in range(self.k):

@@ -1,4 +1,37 @@
 import numpy as np
+import pandas as pd
+from pyproj import Transformer
+
+def latlon_to_utm(lat, lon):
+    # Define the projection for WGS84 (used for GPS coordinates)
+    wgs84_crs = 'EPSG:4326'
+    # Define the UTM zone based on the longitude
+    utm_zone = (((lon[0] + 180) / 6) + 1).astype(int)
+    # Northern Hemisphere has positive latitudes, hence 'north=True'
+    # For Southern Hemisphere use 'north=False'
+    north = lat[0] >= 0
+    utm_crs = f'EPSG:{32600 + utm_zone if north else 32700 + utm_zone}'
+    # Create a Transformer object for converting WGS84 to UTM
+    transformer = Transformer.from_crs(wgs84_crs, utm_crs)
+    # Transform the latitude and longitude to UTM coordinates
+    utm_x, utm_y = transformer.transform(lat, lon)
+    return utm_x, utm_y
+
+
+# READ IN ACTUAL DATA
+def get_real_tree_data(radius_gps):
+    # readin dataset
+    treedf = pd.read_csv('../data/wt_kentland_data.csv', header=0)
+    cluster_loc_lat = treedf.lat.values
+    cluster_loc_lon = treedf.lon.values
+    tree_bm = treedf.biomass_TCO2e.values
+
+    # convert to equal-area
+    cluster_loc_x, cluster_loc_y = latlon_to_utm(cluster_loc_lat, cluster_loc_lon)
+    cluster_locs = np.array([cluster_loc_x, cluster_loc_y]).T
+    tree_locs = record_noisy_gps_locs_unif(cluster_locs, radius=radius_gps)
+
+    return tree_locs, cluster_locs, tree_bm
 
 
 # GENERATE TREE LOCATIONS FROM A MIXTURE OF GAUSSIANS
@@ -23,7 +56,7 @@ def get_random_tree_locs(n_trees, n_groups=10, std_scale=0.5):
     return tree_locs
 
 # ASSIGN BIOMASS TO TREES
-def get_tree_bm(tree_locs, gamma_shape=3, gamma_scale=2, loc_corr=0.5, loc_corr_noise_std=0.025):
+def get_random_tree_bm(tree_locs, gamma_shape=3, gamma_scale=2, loc_corr=0.5, loc_corr_noise_std=0.025):
     # get gamma distributed biomass
     tree_bm = np.random.gamma(shape=gamma_shape, scale=gamma_scale, size=len(tree_locs))
     # include correlation with lat/lon, and some noise

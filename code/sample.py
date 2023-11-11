@@ -1,10 +1,10 @@
 import numpy as np
 
-from inclusion_prob import get_distance_matrix
+from get_inclusion_probability import get_distance_matrix
 from make_data import record_noisy_gps_locs_gaus, record_noisy_gps_locs_unif
 
 class Sample:
-    def __init__(self, units:np.array, n_bootstraps=None):
+    def __init__(self, units:np.array, n_bootstraps):
         self.units = units
         self.true_mean = units.mean()
         self.n_bootstraps = 200 if n_bootstraps is None else n_bootstraps
@@ -38,7 +38,7 @@ class Sample:
 
 
 class SRS(Sample):
-    def __init__(self, units, n_bootstraps=None):
+    def __init__(self, units, n_bootstraps):
         super().__init__(units, n_bootstraps)
     
     def sample(self, n):
@@ -62,7 +62,7 @@ class SRS(Sample):
         
 class PPSWR_SRS(Sample):
     def __init__(self, sunits_scaled, sunit_locs, punit_weights, punit_locs, 
-                 gps_error_type, gps_error, measurement_rad, replace=True, n_bootstraps=None):
+                 gps_error_type, gps_error, measurement_rad, replace, n_bootstraps):
         super().__init__(sunits_scaled, n_bootstraps)
         self.punit_weights = punit_weights # weights for pps
         self.punit_locs = punit_locs # noisy gps locations
@@ -82,22 +82,23 @@ class PPSWR_SRS(Sample):
         # FIRST STAGE (ppswr) -- get primary unit indices
         self.punit_idx_samples = np.random.choice(
             self.N, size=self.k, replace=True, p=self.punit_weights)
-        if self.gps_error_type == 'gaus':
-            punit_measurement_locs = record_noisy_gps_locs_gaus(
-                self.punit_locs[self.punit_idx_samples], self.gps_error)
-        elif self.gps_error_type == 'unif':
+        if self.gps_error_type == 'gausian':
             punit_measurement_locs = record_noisy_gps_locs_gaus(
                 self.punit_locs[self.punit_idx_samples], self.gps_error)
         else:
-            print(f'GPS error type must be one of [gaus, unif], you provided {self.gps_error_type}')
-            return
+            punit_measurement_locs = record_noisy_gps_locs_unif(
+                self.punit_locs[self.punit_idx_samples], self.gps_error)
+
         # loop first-stage units to get second stage units
         self.sunit_idx_samples = []
         for i in range(self.k):
             dist = get_distance_matrix(punit_measurement_locs[[i]], self.sunit_locs)
-            samples = np.where(dist < self.measurement_rad)[1]
-            self.sunit_idx_samples += [
-                np.random.choice(samples, size=len(samples), replace=self.replace)]
+            if (dist >= self.measurement_rad).all():
+                self.sunit_idx_samples += [np.array([])]
+            else:
+                samples = np.where(dist < self.measurement_rad)[1]
+                self.sunit_idx_samples += [
+                    np.random.choice(samples, size=len(samples), replace=self.replace)]
         self.get_stats()
         return {
             'punit_idxs': self.punit_idx_samples, 

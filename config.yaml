@@ -1,0 +1,11 @@
+take_subsample: 'false' # 'false', or an integer reflecting the subsample to take
+radius_gps: 5
+radius_measure: [5, 10, 15]
+gps_error_type: ['rough', 'gaussian', 'uniform']
+
+sample_design: ['SRS', 'PPSWR-SRSWR', 'PPSWR-SRSWOR']
+bootstraps_for_variance: 100
+
+n_samples_min: 10
+n_samples_inc: 90
+n_repeats: 100

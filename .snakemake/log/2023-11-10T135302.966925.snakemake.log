@@ -1,0 +1,69 @@
+Migrating .snakemake folder to new format...
+Migration complete
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                          count
+-------------------------  -------
+all                              1
+get_inclusion_probability        9
+make_data                        3
+simulate_sample_design          27
+total                           40
+
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Fri Nov 10 13:53:09 2023]
+rule make_data:
+    input: data/raw/wt_kentland_data.csv
+    output: data/processed/rough/tree_locs.txt, data/processed/rough/cluster_locs.txt, data/processed/rough/tree_bm.txt, results/rough/fig_tree_locations.png
+    log: logs/make_data_rough.log
+    jobid: 2
+    reason: Code has changed since last execution
+    wildcards: gps_error_type=rough
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Fri Nov 10 13:53:09 2023]
+rule make_data:
+    input: data/raw/wt_kentland_data.csv
+    output: data/processed/gaussian/tree_locs.txt, data/processed/gaussian/cluster_locs.txt, data/processed/gaussian/tree_bm.txt, results/gaussian/fig_tree_locations.png
+    log: logs/make_data_gaussian.log
+    jobid: 15
+    reason: Code has changed since last execution
+    wildcards: gps_error_type=gaussian
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Fri Nov 10 13:53:09 2023]
+rule make_data:
+    input: data/raw/wt_kentland_data.csv
+    output: data/processed/uniform/tree_locs.txt, data/processed/uniform/cluster_locs.txt, data/processed/uniform/tree_bm.txt, results/uniform/fig_tree_locations.png
+    log: logs/make_data_uniform.log
+    jobid: 28
+    reason: Code has changed since last execution
+    wildcards: gps_error_type=uniform
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Fri Nov 10 13:53:10 2023]
+Error in rule make_data:
+    jobid: 15
+    input: data/raw/wt_kentland_data.csv
+    output: data/processed/gaussian/tree_locs.txt, data/processed/gaussian/cluster_locs.txt, data/processed/gaussian/tree_bm.txt, results/gaussian/fig_tree_locations.png
+    log: logs/make_data_gaussian.log (check log file(s) for error details)
+
+RuleException:
+CalledProcessError in file /Users/etriesch/dev/clustersamp/Snakefile, line 42:
+Command 'set -euo pipefail;  /Users/etriesch/dev/clustersamp/venv/clustersamp/bin/python /Users/etriesch/dev/clustersamp/.snakemake/scripts/tmp_8beftbd.make_data.py' returned non-zero exit status 1.
+  File "/Users/etriesch/dev/clustersamp/Snakefile", line 42, in __rule_make_data
+  File "/Users/etriesch/.pyenv/versions/3.9.5/lib/python3.9/concurrent/futures/thread.py", line 52, in run
+[Fri Nov 10 13:53:11 2023]
+Finished job 28.
+1 of 40 steps (2%) done
+[Fri Nov 10 13:53:11 2023]
+Finished job 2.
+2 of 40 steps (5%) done
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2023-11-10T135302.966925.snakemake.log

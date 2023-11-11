@@ -7,9 +7,9 @@ from pyproj import Transformer
 
 from make_data import get_random_tree_locs, get_tree_bm, record_noisy_gps_locs_gaus
 from sample import SRS, PPSWR_SRS
-from inclusion_prob import GPS_ERROR_VARIANCE, MEASUREMENT_RADIUS
-from inclusion_prob import get_distance_matrix, get_rough_inclusion_probs
-from stats import get_bootsrapped_results, plot_bootstrapped_results
+from code.get_inclusion_probability import GPS_ERROR_VARIANCE, MEASUREMENT_RADIUS
+from code.get_inclusion_probability import get_distance_matrix, get_rough_inclusion_probs
+from code.simulate_sample_design import get_bootsrapped_results, plot_bootstrapped_results
 
 # GENERATE DATA AND VISUALIZE
 N = 200

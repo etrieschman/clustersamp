@@ -1,0 +1,22 @@
+\begin{tabular}{l|r|rrr|r|rrr}
+\toprule
+GPS noise type & \multicolumn{4}{r}{gaussian} & \multicolumn{4}{r}{uniform} \\
+Measurement radius &  & 5 & 10 & 15 &  & 5 & 10 & 15 \\
+Design & SRS & PPSWR & PPSWR & PPSWR & SRS & PPSWR & PPSWR & PPSWR \\
+\midrule
+\textbf{True mean} &  0.55685 &  0.55685 &  0.55685 &  0.55685 &  0.55685 &  0.55685 &  0.55685 &  0.55685 \\
+\textbf{Estimator} & 0.55915 & 0.41881 & 0.54911 & 0.55503 & 0.55300 & 0.39451 & 0.55305 & 0.55357 \\
+\textbf{Estimator variance} & 0.00131 & 0.00235 & 0.00189 & 0.00149 & 0.00128 & 0.00226 & 0.00210 & 0.00194 \\
+\textbf{N} & 107 & 107 & 107 & 107 & 107 & 107 & 107 & 107 \\
+\textbf{n primary units} & 65 & 65 & 65 & 65 & 65 & 65 & 65 & 65 \\
+\textbf{t-test of mean estimator (vs. True)} & 0.13679 & 7.5139e-240** & 0.00010028** & 0.31259 & 0.028646** & 6.029e-277** & 0.048631** & 0.093824 \\
+\textbf{Mean of repeat t-tests (vs. True)} & 0.50263 & 0.051408 & 0.47249 & 0.47674 & 0.47546 & 0.024856** & 0.50149 & 0.491 \\
+\textbf{Two-sample t-test (vs. SRS)} & - & 1.115e-288** & 0.0040121** & 0.23103 & - & 1.9673e-318** & 0.34939 & 0.64616 \\
+\textbf{E[M]} & - & 50.84003 & 71.62397 & 88.97139 & - & 97.71871 & 263.48839 & 475.66422 \\
+\textbf{Weighted mean (Z)} & - & 0.610392 & 0.623412 & 0.622147 & - & 0.629484 & 0.654784 & 0.680014 \\
+\textbf{Mean of n secondary units} & - & 70.82400 & 173.44800 & 313.15600 & - & 65.27800 & 176.28600 & 319.21600 \\
+\textbf{     per primary unit} & - & 1.08960 & 2.66843 & 4.81778 & - & 1.00428 & 2.71209 & 4.91102 \\
+\textbf{Variance of n secondary units} & - & 38.27302 & 89.71930 & 232.94366 & - & 33.39672 & 101.08420 & 183.78534 \\
+\textbf{$P(i \in i)$} & - & 0.35121 & 0.39571 & 0.39633 & - & 0.58656 & 0.99976 & 0.99970 \\
+\bottomrule
+\end{tabular}

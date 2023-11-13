@@ -1,0 +1,302 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                       count
+----------------------  -------
+all                           1
+simulate_sample_design       18
+total                        19
+
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver in time (10s). Falling back to greedy solver.
+
+[Sun Nov 12 19:03:14 2023]
+rule simulate_sample_design:
+    input: data/processed/rough/tree_locs.txt, data/processed/rough/cluster_locs.txt, data/processed/rough/tree_bm.txt, resources/rough/inclusion_probability_rad5.txt
+    output: results/rough/results_rad5_SRS.npz, results/rough/fig_rad5_SRS.png
+    log: logs/simulate_sample_design_rough_rad5_SRS.log
+    jobid: 1
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=rough, radius_measure=5, sample_design=SRS
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 19:03:14 2023]
+rule simulate_sample_design:
+    input: data/processed/gaussian/tree_locs.txt, data/processed/gaussian/cluster_locs.txt, data/processed/gaussian/tree_bm.txt, resources/gaussian/inclusion_probability_rad10.txt
+    output: results/gaussian/results_rad10_PPSWR-SRSWR.npz, results/gaussian/fig_rad10_PPSWR-SRSWR.png
+    log: logs/simulate_sample_design_gaussian_rad10_PPSWR-SRSWR.log
+    jobid: 17
+    reason: Missing output files: results/gaussian/results_rad10_PPSWR-SRSWR.npz; Params have changed since last execution
+    wildcards: gps_error_type=gaussian, radius_measure=10, sample_design=PPSWR-SRSWR
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 19:03:14 2023]
+rule simulate_sample_design:
+    input: data/processed/uniform/tree_locs.txt, data/processed/uniform/cluster_locs.txt, data/processed/uniform/tree_bm.txt, resources/uniform/inclusion_probability_rad15.txt
+    output: results/uniform/results_rad15_PPSWR-SRSWR.npz, results/uniform/fig_rad15_PPSWR-SRSWR.png
+    log: logs/simulate_sample_design_uniform_rad15_PPSWR-SRSWR.log
+    jobid: 30
+    reason: Missing output files: results/uniform/results_rad15_PPSWR-SRSWR.npz; Params have changed since last execution
+    wildcards: gps_error_type=uniform, radius_measure=15, sample_design=PPSWR-SRSWR
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 19:03:14 2023]
+rule simulate_sample_design:
+    input: data/processed/gaussian/tree_locs.txt, data/processed/gaussian/cluster_locs.txt, data/processed/gaussian/tree_bm.txt, resources/gaussian/inclusion_probability_rad5.txt
+    output: results/gaussian/results_rad5_PPSWR-SRSWR.npz, results/gaussian/fig_rad5_PPSWR-SRSWR.png
+    log: logs/simulate_sample_design_gaussian_rad5_PPSWR-SRSWR.log
+    jobid: 14
+    reason: Missing output files: results/gaussian/results_rad5_PPSWR-SRSWR.npz; Params have changed since last execution
+    wildcards: gps_error_type=gaussian, radius_measure=5, sample_design=PPSWR-SRSWR
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 19:04:14 2023]
+Finished job 1.
+1 of 19 steps (5%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 19:04:22 2023]
+rule simulate_sample_design:
+    input: data/processed/rough/tree_locs.txt, data/processed/rough/cluster_locs.txt, data/processed/rough/tree_bm.txt, resources/rough/inclusion_probability_rad10.txt
+    output: results/rough/results_rad10_SRS.npz, results/rough/fig_rad10_SRS.png
+    log: logs/simulate_sample_design_rough_rad10_SRS.log
+    jobid: 5
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=rough, radius_measure=10, sample_design=SRS
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 19:05:13 2023]
+Finished job 5.
+2 of 19 steps (11%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 19:05:20 2023]
+rule simulate_sample_design:
+    input: data/processed/rough/tree_locs.txt, data/processed/rough/cluster_locs.txt, data/processed/rough/tree_bm.txt, resources/rough/inclusion_probability_rad10.txt
+    output: results/rough/results_rad10_PPSWR-SRSWR.npz, results/rough/fig_rad10_PPSWR-SRSWR.png
+    log: logs/simulate_sample_design_rough_rad10_PPSWR-SRSWR.log
+    jobid: 7
+    reason: Missing output files: results/rough/results_rad10_PPSWR-SRSWR.npz; Params have changed since last execution
+    wildcards: gps_error_type=rough, radius_measure=10, sample_design=PPSWR-SRSWR
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 19:49:46 2023]
+Finished job 14.
+3 of 19 steps (16%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 19:49:55 2023]
+rule simulate_sample_design:
+    input: data/processed/uniform/tree_locs.txt, data/processed/uniform/cluster_locs.txt, data/processed/uniform/tree_bm.txt, resources/uniform/inclusion_probability_rad5.txt
+    output: results/uniform/results_rad5_SRS.npz, results/uniform/fig_rad5_SRS.png
+    log: logs/simulate_sample_design_uniform_rad5_SRS.log
+    jobid: 21
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=uniform, radius_measure=5, sample_design=SRS
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 19:50:46 2023]
+Finished job 21.
+4 of 19 steps (21%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 19:50:53 2023]
+rule simulate_sample_design:
+    input: data/processed/uniform/tree_locs.txt, data/processed/uniform/cluster_locs.txt, data/processed/uniform/tree_bm.txt, resources/uniform/inclusion_probability_rad10.txt
+    output: results/uniform/results_rad10_SRS.npz, results/uniform/fig_rad10_SRS.png
+    log: logs/simulate_sample_design_uniform_rad10_SRS.log
+    jobid: 25
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=uniform, radius_measure=10, sample_design=SRS
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 19:51:45 2023]
+Finished job 25.
+5 of 19 steps (26%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 19:51:52 2023]
+rule simulate_sample_design:
+    input: data/processed/rough/tree_locs.txt, data/processed/rough/cluster_locs.txt, data/processed/rough/tree_bm.txt, resources/rough/inclusion_probability_rad15.txt
+    output: results/rough/results_rad15_PPSWR-SRSWR.npz, results/rough/fig_rad15_PPSWR-SRSWR.png
+    log: logs/simulate_sample_design_rough_rad15_PPSWR-SRSWR.log
+    jobid: 10
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=rough, radius_measure=15, sample_design=PPSWR-SRSWR
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 19:59:12 2023]
+Finished job 17.
+6 of 19 steps (32%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 19:59:21 2023]
+rule simulate_sample_design:
+    input: data/processed/gaussian/tree_locs.txt, data/processed/gaussian/cluster_locs.txt, data/processed/gaussian/tree_bm.txt, resources/gaussian/inclusion_probability_rad5.txt
+    output: results/gaussian/results_rad5_SRS.npz, results/gaussian/fig_rad5_SRS.png
+    log: logs/simulate_sample_design_gaussian_rad5_SRS.log
+    jobid: 11
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=gaussian, radius_measure=5, sample_design=SRS
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 19:59:33 2023]
+Finished job 30.
+7 of 19 steps (37%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 19:59:40 2023]
+rule simulate_sample_design:
+    input: data/processed/uniform/tree_locs.txt, data/processed/uniform/cluster_locs.txt, data/processed/uniform/tree_bm.txt, resources/uniform/inclusion_probability_rad10.txt
+    output: results/uniform/results_rad10_PPSWR-SRSWR.npz, results/uniform/fig_rad10_PPSWR-SRSWR.png
+    log: logs/simulate_sample_design_uniform_rad10_PPSWR-SRSWR.log
+    jobid: 27
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=uniform, radius_measure=10, sample_design=PPSWR-SRSWR
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 20:00:12 2023]
+Finished job 11.
+8 of 19 steps (42%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 20:00:18 2023]
+rule simulate_sample_design:
+    input: data/processed/gaussian/tree_locs.txt, data/processed/gaussian/cluster_locs.txt, data/processed/gaussian/tree_bm.txt, resources/gaussian/inclusion_probability_rad10.txt
+    output: results/gaussian/results_rad10_SRS.npz, results/gaussian/fig_rad10_SRS.png
+    log: logs/simulate_sample_design_gaussian_rad10_SRS.log
+    jobid: 15
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=gaussian, radius_measure=10, sample_design=SRS
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 20:01:08 2023]
+Finished job 15.
+9 of 19 steps (47%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 20:01:15 2023]
+rule simulate_sample_design:
+    input: data/processed/gaussian/tree_locs.txt, data/processed/gaussian/cluster_locs.txt, data/processed/gaussian/tree_bm.txt, resources/gaussian/inclusion_probability_rad15.txt
+    output: results/gaussian/results_rad15_SRS.npz, results/gaussian/fig_rad15_SRS.png
+    log: logs/simulate_sample_design_gaussian_rad15_SRS.log
+    jobid: 18
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=gaussian, radius_measure=15, sample_design=SRS
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 20:01:15 2023]
+Finished job 7.
+10 of 19 steps (53%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 20:01:21 2023]
+rule simulate_sample_design:
+    input: data/processed/rough/tree_locs.txt, data/processed/rough/cluster_locs.txt, data/processed/rough/tree_bm.txt, resources/rough/inclusion_probability_rad5.txt
+    output: results/rough/results_rad5_PPSWR-SRSWR.npz, results/rough/fig_rad5_PPSWR-SRSWR.png
+    log: logs/simulate_sample_design_rough_rad5_PPSWR-SRSWR.log
+    jobid: 4
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=rough, radius_measure=5, sample_design=PPSWR-SRSWR
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 20:02:05 2023]
+Finished job 18.
+11 of 19 steps (58%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 20:02:12 2023]
+rule simulate_sample_design:
+    input: data/processed/rough/tree_locs.txt, data/processed/rough/cluster_locs.txt, data/processed/rough/tree_bm.txt, resources/rough/inclusion_probability_rad15.txt
+    output: results/rough/results_rad15_SRS.npz, results/rough/fig_rad15_SRS.png
+    log: logs/simulate_sample_design_rough_rad15_SRS.log
+    jobid: 8
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=rough, radius_measure=15, sample_design=SRS
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 20:03:03 2023]
+Finished job 8.
+12 of 19 steps (63%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 20:03:09 2023]
+rule simulate_sample_design:
+    input: data/processed/uniform/tree_locs.txt, data/processed/uniform/cluster_locs.txt, data/processed/uniform/tree_bm.txt, resources/uniform/inclusion_probability_rad15.txt
+    output: results/uniform/results_rad15_SRS.npz, results/uniform/fig_rad15_SRS.png
+    log: logs/simulate_sample_design_uniform_rad15_SRS.log
+    jobid: 28
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=uniform, radius_measure=15, sample_design=SRS
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 20:04:00 2023]
+Finished job 28.
+13 of 19 steps (68%) done
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver. Run Snakemake with --verbose to see the full solver output for debugging the problem.
+
+[Sun Nov 12 20:04:07 2023]
+rule simulate_sample_design:
+    input: data/processed/uniform/tree_locs.txt, data/processed/uniform/cluster_locs.txt, data/processed/uniform/tree_bm.txt, resources/uniform/inclusion_probability_rad5.txt
+    output: results/uniform/results_rad5_PPSWR-SRSWR.npz, results/uniform/fig_rad5_PPSWR-SRSWR.png
+    log: logs/simulate_sample_design_uniform_rad5_PPSWR-SRSWR.log
+    jobid: 24
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=uniform, radius_measure=5, sample_design=PPSWR-SRSWR
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 20:46:11 2023]
+Finished job 4.
+14 of 19 steps (74%) done
+Select jobs to execute...
+
+[Sun Nov 12 20:46:11 2023]
+rule simulate_sample_design:
+    input: data/processed/gaussian/tree_locs.txt, data/processed/gaussian/cluster_locs.txt, data/processed/gaussian/tree_bm.txt, resources/gaussian/inclusion_probability_rad15.txt
+    output: results/gaussian/results_rad15_PPSWR-SRSWR.npz, results/gaussian/fig_rad15_PPSWR-SRSWR.png
+    log: logs/simulate_sample_design_gaussian_rad15_PPSWR-SRSWR.log
+    jobid: 20
+    reason: Params have changed since last execution
+    wildcards: gps_error_type=gaussian, radius_measure=15, sample_design=PPSWR-SRSWR
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 20:47:30 2023]
+Finished job 10.
+15 of 19 steps (79%) done
+[Sun Nov 12 20:50:01 2023]
+Finished job 24.
+16 of 19 steps (84%) done
+[Sun Nov 12 20:54:49 2023]
+Finished job 27.
+17 of 19 steps (89%) done
+[Sun Nov 12 21:36:37 2023]
+Finished job 20.
+18 of 19 steps (95%) done
+Select jobs to execute...
+
+[Sun Nov 12 21:36:37 2023]
+localrule all:
+    input: results/rough/results_rad5_SRS.npz, results/rough/results_rad5_PPSWR-SRSWR.npz, results/rough/results_rad10_SRS.npz, results/rough/results_rad10_PPSWR-SRSWR.npz, results/rough/results_rad15_SRS.npz, results/rough/results_rad15_PPSWR-SRSWR.npz, results/gaussian/results_rad5_SRS.npz, results/gaussian/results_rad5_PPSWR-SRSWR.npz, results/gaussian/results_rad10_SRS.npz, results/gaussian/results_rad10_PPSWR-SRSWR.npz, results/gaussian/results_rad15_SRS.npz, results/gaussian/results_rad15_PPSWR-SRSWR.npz, results/uniform/results_rad5_SRS.npz, results/uniform/results_rad5_PPSWR-SRSWR.npz, results/uniform/results_rad10_SRS.npz, results/uniform/results_rad10_PPSWR-SRSWR.npz, results/uniform/results_rad15_SRS.npz, results/uniform/results_rad15_PPSWR-SRSWR.npz
+    jobid: 0
+    reason: Input files updated by another job: results/rough/results_rad10_SRS.npz, results/uniform/results_rad15_SRS.npz, results/uniform/results_rad5_SRS.npz, results/gaussian/results_rad10_PPSWR-SRSWR.npz, results/uniform/results_rad5_PPSWR-SRSWR.npz, results/gaussian/results_rad15_PPSWR-SRSWR.npz, results/gaussian/results_rad5_SRS.npz, results/rough/results_rad5_SRS.npz, results/uniform/results_rad15_PPSWR-SRSWR.npz, results/uniform/results_rad10_PPSWR-SRSWR.npz, results/gaussian/results_rad15_SRS.npz, results/rough/results_rad5_PPSWR-SRSWR.npz, results/rough/results_rad15_PPSWR-SRSWR.npz, results/gaussian/results_rad10_SRS.npz, results/rough/results_rad15_SRS.npz, results/rough/results_rad10_PPSWR-SRSWR.npz, results/gaussian/results_rad5_PPSWR-SRSWR.npz, results/uniform/results_rad10_SRS.npz
+    resources: tmpdir=/var/folders/mw/dy3m3wg11js6x91fwng5ptdw0000gn/T
+
+[Sun Nov 12 21:36:37 2023]
+Finished job 0.
+19 of 19 steps (100%) done
+Complete log: .snakemake/log/2023-11-12T190301.241852.snakemake.log

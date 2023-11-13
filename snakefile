@@ -13,13 +13,6 @@ PATH_RESULTS = 'results/'
 
 rule all:
     input:
-        # expand(PATH_RESOURCES + '{gps_error_type}/inclusion_probability_rad{radius_measure}.txt',
-        #        gps_error_type=config['gps_error_type'],
-        #        radius_measure=config['radius_measure']),
-        # expand(PATH_RESULTS + '{gps_error_type}/fig_rad{radius_measure}_{sample_design}.png',
-        #        gps_error_type=config['gps_error_type'],
-        #        radius_measure=config['radius_measure'],
-        #        sample_design=config['sample_design']),
         expand(PATH_RESULTS + '{gps_error_type}/results_rad{radius_measure}_{sample_design}.npz',
                gps_error_type=config['gps_error_type'],
                radius_measure=config['radius_measure'],

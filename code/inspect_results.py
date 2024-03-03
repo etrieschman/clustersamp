@@ -29,7 +29,7 @@ for n in ns:
     nindex = n - nmin
     summ = pd.DataFrame()
     for gps_error_type in gps_error_types:
-        tree_bm = np.loadtxt(PATH_DATA + f'processed/{gps_error_type}/tree_bm.txt', delimiter=',')[:len(inc_probs)]
+        tree_bm = np.loadtxt(PATH_DATA + f'processed/{gps_error_type}/tree_bm.txt', delimiter=',')
         for radius_measure in radius_measures:
 
             # get sample results

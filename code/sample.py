@@ -61,10 +61,11 @@ class SRS(Sample):
              ).var() 
         
 class PPSWR_SRS(Sample):
-    def __init__(self, sunits_scaled, sunit_locs, punit_weights, punit_locs, 
+    def __init__(self, sunits, sunit_locs, punit_weights, punit_scales, punit_locs, 
                  gps_error_type, gps_error, measurement_rad, replace, n_bootstraps):
-        super().__init__(sunits_scaled, n_bootstraps)
+        super().__init__(sunits, n_bootstraps)
         self.punit_weights = punit_weights # weights for pps
+        self.punit_scales = punit_scales # what to scale each secondary unit mean by
         self.punit_locs = punit_locs # noisy gps locations
         self.sunit_locs = sunit_locs # true tree locations
         self.gps_error_type = gps_error_type
@@ -107,10 +108,11 @@ class PPSWR_SRS(Sample):
     def _calculate_sample_mean(self):
         self.cluster_mean = np.array(
             [self.units[idxs].mean() if len(idxs) > 0 else 0 for idxs in self.sunit_idx_samples])
-        self.sample_mean = self.cluster_mean.mean()
+        self.sample_mean = (self.punit_scales[self.punit_idx_samples]*self.cluster_mean).mean()
 
     def _calculate_sample_variance(self):
-        self.sample_mean_variance = self.cluster_mean.var() / self.k
+        self.sample_mean_variance = (
+            self.punit_scales[self.punit_idx_samples]*self.cluster_mean).var() / self.k
 
     def _calculate_sample_variance_boot(self):
         bootstrap_means = np.zeros(self.n_bootstraps)
@@ -119,7 +121,8 @@ class PPSWR_SRS(Sample):
             bootstrap_cluster_means = np.array(
                 [np.random.choice(self.units[idxs], size=len(idxs), replace=True).mean()
                  if (len(idxs) != 0) else 0 for idxs in self.sunit_idx_samples])
-            bootstrap_means[i] = np.random.choice(
-                bootstrap_cluster_means, size=self.k, replace=True).mean()
+            means_idx = np.random.choice(np.arange(len(bootstrap_cluster_means)),
+                                         size=self.k, replace=True)
+            bootstrap_means[i] = (self.punit_scales[means_idx]*bootstrap_cluster_means[means_idx]).mean()
         self.sample_mean_variance_boot = bootstrap_means.var()
         

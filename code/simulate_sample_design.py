@@ -38,22 +38,26 @@ def get_bootsrapped_results(sampler:Sample, n_min=2, ns=100, n_repeats=500):
 def plot_bootstrapped_results(true_mean, results, outfile=None, n_tree_ylim=None):
     # plot
     fig, ax = plt.subplots(nrows=3, sharex=True, figsize=(6, 8))
-    ax[2].boxplot(results['n_samples'].T, patch_artist=False)
-    ax[1].boxplot(results['means'].T, patch_artist=False)
-    ax[1].axhline(true_mean, label='true mean')
-    ax[0].plot(results['means'].var(1), label='variance of means across repeats')
-    ax[0].plot(results['vars'].mean(1), label='sample mean variance (analytical)')
-    ax[0].plot(results['vars_boot'].mean(1), label='sample mean variance (bootstrap)')
+    ax[2].boxplot(results['n_samples'].T, patch_artist=False, showfliers=False, boxprops={'linewidth':0.5})
+    ax[1].boxplot(results['means'].T, patch_artist=False, boxprops={'linewidth':0.5})
+    ax[1].axhline(true_mean, alpha=0.7, linestyle='--', label='true mean')
+    # ax[0].plot(results['means'].var(1), label='variance of means across repeats')
+    ax[0].plot(results['vars'].mean(1), alpha=0.75, color='C0', label='analytical derivation')
+    ax[0].fill_between(x=np.arange(len(results['vars'].min(1))),
+                        y1=results['vars'].min(1), y2=results['vars'].max(1), alpha=0.15, color='C0')
+    ax[0].plot(results['vars_boot'].mean(1), alpha=0.75, color='C1', label='bootstrapped estimation')
+    ax[0].fill_between(x=np.arange(len(results['vars_boot'].min(1))),
+                        y1=results['vars_boot'].min(1), y2=results['vars'].max(1), alpha=0.15, color='C1', label='range (min-max)')
     ax[2].set_xticks(
         np.arange(results['params']['ns'], step=10), 
         np.arange(results['params']['n_min'], 
                   results['params']['ns']+results['params']['n_min'], step=10))
     ax[2].set_xlabel('n primary samples')
     ax[1].set_ylabel('distribution of sample means')
-    ax[2].set_ylabel('n tree measurements')
+    ax[2].set_ylabel('n trees measured')
     if n_tree_ylim is not None:
         ax[2].set_ylim(n_tree_ylim)
-    ax[0].set_ylabel('variance in sample mean')
+    ax[0].set_ylabel('estimator variance')
     ax[1].legend()
     ax[0].legend()
     if outfile is not None:
@@ -61,10 +65,11 @@ def plot_bootstrapped_results(true_mean, results, outfile=None, n_tree_ylim=None
     else:
         plt.show()
 
+
 if __name__ == '__main__':
     if "snakemake" not in globals():
         snakemake = mock_snakemake('simulate_sample_design',
-                                   gps_error_type='rough',
+                                   gps_error_type='gaussian',
                                    radius_measure=10,
                                    sample_design='PPSWR-SRSWR')
     
@@ -88,7 +93,9 @@ if __name__ == '__main__':
     EN = inc_probs.sum(0)
     EM = EN.sum()
     EF = inc_probs.sum(1)
+    EFk = (1/EN) * (inc_probs @ EF)
     N = len(tree_locs)
+    Zcoef = (EM / N) * (1/EFk)
     Z = EM / (N*EF) * tree_bm
 
     # parameter_dictionary
@@ -100,8 +107,9 @@ if __name__ == '__main__':
         'PPSWR-SRSWOR': {
             'sampler':PPSWR_SRS,
             'params':{
-                'sunits_scaled':Z, 'sunit_locs':tree_locs, 
-                'punit_weights':EN/EM, 'punit_locs':cluster_locs, 
+                'sunits':tree_bm, 'sunit_locs':tree_locs, 
+                'punit_weights':EN/EM, 'punit_scales':Zcoef,
+                'punit_locs':cluster_locs, 
                 'gps_error_type':gps_error_type,
                 'gps_error':radius_gps, 
                 'measurement_rad':radius_measure, 
@@ -111,8 +119,9 @@ if __name__ == '__main__':
         'PPSWR-SRSWR': {
             'sampler':PPSWR_SRS,
             'params':{
-                'sunits_scaled':Z, 'sunit_locs':tree_locs, 
-                'punit_weights':EN/EM, 'punit_locs':cluster_locs, 
+                'sunits':tree_bm, 'sunit_locs':tree_locs, 
+                'punit_weights':EN/EM, 'punit_scales':Zcoef,
+                'punit_locs':cluster_locs, 
                 'gps_error_type':gps_error_type,
                 'gps_error':radius_gps, 
                 'measurement_rad':radius_measure, 
@@ -130,7 +139,7 @@ if __name__ == '__main__':
 
     # plot results
     plot_bootstrapped_results(true_mean=tree_bm.mean(), results=results, 
-                                outfile=snakemake.output.fig, n_tree_ylim=(0, N*2.5))
+                                outfile=snakemake.output.fig, n_tree_ylim=None)
 
 
 # %%

@@ -111,8 +111,7 @@ class PPSWR_SRS(Sample):
         self.sample_mean = (self.punit_scales[self.punit_idx_samples]*self.cluster_mean).mean()
 
     def _calculate_sample_variance(self):
-        self.sample_mean_variance = (
-            self.punit_scales[self.punit_idx_samples]*self.cluster_mean).var() / self.k
+        self.sample_mean_variance = (self.punit_scales[self.punit_idx_samples]*self.cluster_mean).var() / self.k
 
     def _calculate_sample_variance_boot(self):
         bootstrap_means = np.zeros(self.n_bootstraps)
@@ -123,6 +122,8 @@ class PPSWR_SRS(Sample):
                  if (len(idxs) != 0) else 0 for idxs in self.sunit_idx_samples])
             means_idx = np.random.choice(np.arange(len(bootstrap_cluster_means)),
                                          size=self.k, replace=True)
-            bootstrap_means[i] = (self.punit_scales[means_idx]*bootstrap_cluster_means[means_idx]).mean()
+            bootstrap_means[i] = (
+                self.punit_scales[self.punit_idx_samples][means_idx] * 
+                bootstrap_cluster_means[means_idx]).mean()
         self.sample_mean_variance_boot = bootstrap_means.var()
         

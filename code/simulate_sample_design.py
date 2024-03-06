@@ -69,8 +69,8 @@ def plot_bootstrapped_results(true_mean, results, outfile=None, n_tree_ylim=None
 if __name__ == '__main__':
     if "snakemake" not in globals():
         snakemake = mock_snakemake('simulate_sample_design',
-                                   gps_error_type='gaussian',
-                                   radius_measure=10,
+                                   gps_error_type='uniform',
+                                   radius_measure=15,
                                    sample_design='PPSWR-SRSWR')
     
     # parameters
@@ -90,13 +90,28 @@ if __name__ == '__main__':
     inc_probs = np.loadtxt(snakemake.input.inc_probs, delimiter=',')
 
     # calculate expected value of cluster size and scaled values
-    EN = inc_probs.sum(0)
-    EM = EN.sum()
-    EF = inc_probs.sum(1)
-    EFk = (1/EN) * (inc_probs @ EF)
+    # row is secondary unit
+    # col is primary unit
+    ENis = inc_probs.sum(0)
+    EM = ENis.sum()
+    EFjs = inc_probs.sum(1)
+    # EFjnotis = EFjs[:, np.newaxis] - inc_probs
+    # EFis = 1 + (1/ENis) * (inc_probs * EFjnotis).sum(0)
+    EFis = (1/ENis) * (inc_probs @ EFjs)
     N = len(tree_locs)
-    Zcoef = (EM / N) * (1/EFk)
-    Z = EM / (N*EF) * tree_bm
+    Zcoef = (EM / (N * ENis))
+
+    # compare approaches
+    # plt.hist(EFis, alpha=0.5, label='EFis')
+    # plt.hist(ENis, alpha=0.5, label='ENis')
+    # plt.legend()
+    # plt.show()
+    # plt.scatter(EFis, ENis)
+    # plt.show()
+    print('true mean', tree_bm.mean())
+    print('2S design', (inc_probs @ (tree_bm / EFjs )).mean())
+    print('Approx design', ((1/ENis) * (inc_probs @ tree_bm)).mean())
+
 
     # parameter_dictionary
     sampler_dict = {
@@ -108,7 +123,7 @@ if __name__ == '__main__':
             'sampler':PPSWR_SRS,
             'params':{
                 'sunits':tree_bm, 'sunit_locs':tree_locs, 
-                'punit_weights':EN/EM, 'punit_scales':Zcoef,
+                'punit_weights':ENis/EM, 'punit_scales':Zcoef,
                 'punit_locs':cluster_locs, 
                 'gps_error_type':gps_error_type,
                 'gps_error':radius_gps, 
@@ -120,7 +135,7 @@ if __name__ == '__main__':
             'sampler':PPSWR_SRS,
             'params':{
                 'sunits':tree_bm, 'sunit_locs':tree_locs, 
-                'punit_weights':EN/EM, 'punit_scales':Zcoef,
+                'punit_weights':ENis/EM, 'punit_scales':Zcoef,
                 'punit_locs':cluster_locs, 
                 'gps_error_type':gps_error_type,
                 'gps_error':radius_gps, 

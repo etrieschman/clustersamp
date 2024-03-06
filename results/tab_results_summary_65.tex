@@ -1,22 +1,23 @@
 \begin{tabular}{l|r|rrr|r|rrr}
 \toprule
-GPS noise type & \multicolumn{4}{r}{gaussian} & \multicolumn{4}{r}{uniform} \\
-Measurement radius &  & 5 & 10 & 15 &  & 5 & 10 & 15 \\
-Design & SRS & PPSWR & PPSWR & PPSWR & SRS & PPSWR & PPSWR & PPSWR \\
+GPS noise type & \multicolumn{2}{r}{gaussian} & \multicolumn{2}{r}{uniform} \\
+Measurement radius &  & 15 &  & 15 \\
+Design & SRS & PPSWR & SRS & PPSWR \\
 \midrule
-\textbf{True mean} &  0.55685 &  0.55685 &  0.55685 &  0.55685 &  0.55685 &  0.55685 &  0.55685 &  0.55685 \\
-\textbf{Estimator} & 0.55602 & 0.41102 & 0.53877 & 0.54219 & 0.55652 & 0.39293 & 0.53588 & 0.52733 \\
-\textbf{Estimator variance} & 0.00136 & 0.00237 & 0.00175 & 0.00137 & 0.00125 & 0.00231 & 0.00181 & 0.00161 \\
-\textbf{N} & 107 & 107 & 107 & 107 & 107 & 107 & 107 & 107 \\
-\textbf{n primary units} & 65 & 65 & 65 & 65 & 65 & 65 & 65 & 65 \\
-\textbf{t-test of mean estimator (vs. True)} & 0.81212 & 1.498e-54** & 0.00010769** & 0.00023345** & 0.92362 & 2.939e-58** & 1.4887e-05** & 1.6322e-11** \\
-\textbf{Mean of repeat t-tests (vs. True)} & 0.49184 & 0.039318** & 0.42241 & 0.44911 & 0.51801 & 0.021152** & 0.45141 & 0.39546 \\
-\textbf{Two-sample t-test (vs. SRS)} & - & 1.618e-64** & 0.0047884** & 0.021575** & - & 4.8287e-72** & 0.00061941** & 8.714e-09** \\
-\textbf{E[M]} & - & 50.84003 & 71.62397 & 88.97139 & - & 97.71871 & 263.48839 & 475.66422 \\
-\textbf{Weighted mean (Z)} & - & 0.610392 & 0.623412 & 0.622147 & - & 0.629484 & 0.654784 & 0.680014 \\
-\textbf{Mean of n secondary units} & - & 70.48000 & 173.50000 & 312.90000 & - & 64.69000 & 175.46000 & 317.07000 \\
-\textbf{     per primary unit} & - & 1.08431 & 2.66923 & 4.81385 & - & 0.99523 & 2.69938 & 4.87800 \\
-\textbf{Variance of n secondary units} & - & 29.06960 & 90.69000 & 219.27000 & - & 25.83390 & 108.42840 & 177.64510 \\
-\textbf{$P(i \in i)$} & - & 0.35121 & 0.39571 & 0.39633 & - & 0.58656 & 0.99976 & 0.99970 \\
+\textbf{True mean} &  0.55685 &  0.55685 &  0.55685 &  0.55685 \\
+\textbf{Estimator} & 0.55593 & - & 0.55662 & - \\
+\textbf{Estimator variance} & 0.00131 & 0.00154 & 0.00127 & 0.00214 \\
+\textbf{N} & 107 & 107 & 107 & 107 \\
+\textbf{n primary units} & 65 & 65 & 65 & 65 \\
+\textbf{t-test of mean estimator (vs. True)} & 0.80547 & - & 0.94728 & - \\
+\textbf{Mean of repeat t-tests (vs. True)} & 0.48403 & 0.49783 & 0.49417 & 0.5538 \\
+\textbf{Estimator mean} & - & 0.55420 & - & 0.55903 \\
+\textbf{t-test of estimator mean (vs. True)} & - & 0.49186 & - & 0.60376 \\
+\textbf{Two-sample t-test (vs. SRS)} & - & 0.74697 & - & 0.65967 \\
+\textbf{Mean of two-sample t-tests (vs. SRS)} & - & - & - & - \\
+\textbf{E[M]} & - & 88.97264 & - & 475.79446 \\
+\textbf{Mean n secondary units} & - & 317.47000 & - & 330.66000 \\
+\textbf{     per primary unit} & - & 4.88415 & - & 5.08708 \\
+\textbf{$P(i \in C_i)$} & - & 0.39633 & - & 1.00023 \\
 \bottomrule
 \end{tabular}

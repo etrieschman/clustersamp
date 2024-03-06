@@ -16,6 +16,7 @@ radius_measures = [15, 10, 5]
 sample_designs = ['PPSWR-SRSWR', 'SRS']
 gps_error_types = ['uniform', 'gaussian']
 ns = [25, 45, 65]
+ns = [25, 45]
 
 # helper functions
 def get_mean_pvalue(results, nindex, true_mean):
@@ -31,10 +32,9 @@ for n in ns:
     for gps_error_type in gps_error_types:
         tree_bm = np.loadtxt(PATH_DATA + f'processed/{gps_error_type}/tree_bm.txt', delimiter=',')
         for radius_measure in radius_measures:
-
             # get sample results
             try:
-                inc_probs = np.loadtxt(PATH_RESOURCES + f'{gps_error_type}/inclusion_probability_rad{radius_measure}.txt', delimiter=',')
+                inc_probs = np.loadtxt(PATH_RESOURCES + f'{gps_error_type}/ip_rad{radius_measure}.txt', delimiter=',')
                 results_srs = np.load(PATH_RESULTS + f'{gps_error_type}/results_rad{radius_measure}_SRS.npz', allow_pickle=True)
                 results_pps = np.load(PATH_RESULTS + f'{gps_error_type}/results_rad{radius_measure}_PPSWR-SRSWR.npz', allow_pickle=True)
             except:
@@ -45,7 +45,6 @@ for n in ns:
             EM = EN.sum()
             EF = inc_probs.sum(1)
             N = len(tree_bm)
-            Z = EM / (N*EF) * tree_bm
 
             # Make summary table
             ttest = sps.ttest_1samp(results_pps['means'][nindex], tree_bm.mean())
@@ -55,19 +54,18 @@ for n in ns:
             # estimator values
             summiter_pps = {
                 'True mean':f'{tree_bm.mean(): 0.5f}',
-                'Estimator':f"{results_pps['means'][nindex].mean():0.5f}",
+                'Estimator mean':f"{results_pps['means'][nindex].mean():0.5f}",
                 'Estimator variance':f"{results_pps['vars'][nindex].mean():0.5f}",
                 'N':str(N),
                 'n primary units':str(n),
-                't-test of mean estimator (vs. True)':ttest,
+                't-test of estimator mean (vs. True)':ttest,
                 'Mean of repeat t-tests (vs. True)':get_mean_pvalue(results_pps, nindex, tree_bm.mean()),
                 'Two-sample t-test (vs. SRS)':ttest2samp,
+                'Mean of two-sample t-tests (vs. SRS)':None,
                 'E[M]':f'{EM.copy():0.5f}',
-                'Weighted mean (Z)': Z.mean(),
-                'Mean of n secondary units':f"{results_pps['n_samples'][nindex].mean():0.5f}",
+                'Mean n secondary units':f"{results_pps['n_samples'][nindex].mean():0.5f}",
                 '     per primary unit': f"{results_pps['n_samples'][nindex].mean()/n:0.5f}",
-                'Variance of n secondary units':f"{results_pps['n_samples'][nindex].var():0.5f}",
-                '$P(i \in i)$':f"{inc_probs[0,0]:0.5f}",
+                '$P(i \in C_i)$':f"{inc_probs[0,0]:0.5f}",
             }
 
             index_pps = pd.MultiIndex.from_tuples(
@@ -96,13 +94,13 @@ for n in ns:
                 summiter_srs = pd.DataFrame(summiter_srs, index=index_srs).T
                 summ = pd.concat([summiter_srs, summ], axis=1)
 
-            # plot tstats
-            tstats = (results_pps['means'] - tree_bm.mean()) / np.sqrt(results_pps['vars'] / n)
-            p_values_one_sided = sps.t.sf(abs(tstats), n)  # one-sided p-value
-            p_values_two_sided = p_values_one_sided * 2 
-            plt.plot(p_values_two_sided.mean(1))
-            plt.title(f'N{n}_{gps_error_type}_rad{radius_measure}')
-            plt.show()
+            # # plot tstats
+            # tstats = (results_pps['means'] - tree_bm.mean()) / np.sqrt(results_pps['vars'] / n)
+            # p_values_one_sided = sps.t.sf(abs(tstats), n)  # one-sided p-value
+            # p_values_two_sided = p_values_one_sided * 2 
+            # plt.plot(p_values_two_sided.mean(1))
+            # plt.title(f'N{n}_{gps_error_type}_rad{radius_measure}')
+            # plt.show()
 
     summ = summ.fillna('-').round(5)
     summ.to_latex(buf=PATH_RESULTS + f'tab_results_summary_{n}.tex', 

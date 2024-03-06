@@ -22,7 +22,7 @@ def integrand_gaus(x_j, y_j, r_m, theta_m, loc_j, loc_i, radius_gps):
     )
     return prob
 
-def inclusion_prob_gaus(loc_j, loc_i, radius_gps, radius_measure):
+def inclusion_prob_gaus(loc_j, loc_i, radius_gps, radius_measure, opts):
     max_dist = (2*radius_gps+radius_measure) # limit +/-infty to a max distance
     result, __ = nquad(
         integrand_gaus,
@@ -33,7 +33,7 @@ def inclusion_prob_gaus(loc_j, loc_i, radius_gps, radius_measure):
             (0, radius_measure),
             (0, 2*np.pi)],
         # opts={'epsabs': 1.49e-08, 'epsrel': 1.49e-08, 'limit':50}
-        opts={'epsabs': 1e-01, 'epsrel':5e-01, 'limit':4}
+        opts=opts
         )
     return result 
 
@@ -42,10 +42,10 @@ def integrand_unif(r_j, theta_j, r_m, theta_m, loc_j, loc_i, radius_gps):
     '''integrand for inclusion probabilities, assuming uniform distribution'''
     x_diff = r_m*np.cos(theta_m) + r_j*np.cos(theta_j) + loc_j[0] - loc_i[0]
     y_diff = r_m*np.sin(theta_m) + r_j*np.sin(theta_j) + loc_j[1] - loc_i[1]
-    indicator = x_diff**2 + y_diff**2 <= radius_gps**2
+    indicator = (x_diff**2 + y_diff**2 <= radius_gps**2)
     return r_j * r_m * indicator
 
-def inclusion_prob_unif(loc_j, loc_i, radius_gps, radius_measure):
+def inclusion_prob_unif(loc_j, loc_i, radius_gps, radius_measure, opts):
     scale = 1 / (np.pi * radius_gps**2)**2
     result, __ = nquad(
         integrand_unif,
@@ -56,21 +56,24 @@ def inclusion_prob_unif(loc_j, loc_i, radius_gps, radius_measure):
             (0, radius_measure),
             (0, 2*np.pi)],
         # opts={'epsabs': 1.49e-08, 'epsrel': 1.49e-08, 'limit':50}
-        opts={'epsabs': 1e-01/scale, 'epsrel':5e-01, 'limit':4}
+        opts=opts
         )
     return result * scale
 
 
-def get_inclusion_probs(inclusion_prob_method, locs, radius_gps, radius_measure):
+def get_inclusion_probs(inclusion_prob_method, locs, radius_gps, radius_measure, opts):
     N = len(locs)
     inc_probs = np.zeros((N, N))
-    # iterate through all pairs only once; skip when distance is too far
+    # iterate through all pairs; skip when distance is too far
     for i in tqdm(range(N), disable=False):
         for j in tqdm(range(i, N), disable=True):
+        # for j in tqdm(range(N), disable=True):
             dist = np.linalg.norm(locs[i] - locs[j])
             if dist > (radius_gps*2 + radius_measure):
                 continue
-            inc_probs[i,j] = inclusion_prob_method(locs[i], locs[j], radius_gps, radius_measure)
+            inc_probs[i,j] = inclusion_prob_method(locs[i], locs[j], 
+                                                   radius_gps, radius_measure, 
+                                                   opts)
     # make symmetric
     inc_probs = inc_probs + inc_probs.T - np.diag(inc_probs.diagonal())
     return inc_probs
@@ -94,21 +97,27 @@ def get_rough_inclusion_probs(locs, eps=1e-1):
 
 if __name__ == '__main__':
     if "snakemake" not in globals():
-        snakemake = mock_snakemake('get_inclusion_probability')
+        snakemake = mock_snakemake('get_inclusion_probability',
+                                   gps_error_type='gaussian',
+                                   radius_measure=10,
+                                   sample_design='PPSWR-SRSWR')
     
     radius_gps = int(snakemake.params.radius_gps)
     radius_measure = int(snakemake.wildcards.radius_measure)
     gps_error_type = snakemake.wildcards.gps_error_type
+    opts = {'epsabs': float(snakemake.params.epsabs),
+            'epsrel': float(snakemake.params.epsrel),
+            'limit': int(snakemake.params.limit)}
     tree_locs = np.loadtxt(snakemake.input.tree_locs, delimiter=',')
     cluster_locs = np.loadtxt(snakemake.input.cluster_locs, delimiter=',')
 
 
     if gps_error_type == 'gaussian':
         inclusion_probs = get_inclusion_probs(
-            inclusion_prob_gaus, cluster_locs, radius_gps, radius_measure)
+            inclusion_prob_gaus, cluster_locs, radius_gps, radius_measure, opts)
     elif gps_error_type == 'uniform':
         inclusion_probs = get_inclusion_probs(
-            inclusion_prob_unif, cluster_locs, radius_gps, radius_measure)
+            inclusion_prob_unif, cluster_locs, radius_gps, radius_measure, opts)
     elif gps_error_type == 'rough':
         inclusion_probs = get_rough_inclusion_probs(cluster_locs)
 

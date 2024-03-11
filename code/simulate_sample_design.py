@@ -38,15 +38,18 @@ def get_bootsrapped_results(sampler:Sample, n_min=2, ns=100, n_repeats=500):
 def plot_bootstrapped_results(true_mean, results, outfile=None, n_tree_ylim=None):
     # plot
     fig, ax = plt.subplots(nrows=3, sharex=True, figsize=(6, 8))
-    flierprops = dict(marker='.', markerfacecolor='grey', markersize=1, markeredgecolor='none', alpha=0.5)
+    flierprops = dict(marker='.', markerfacecolor='grey', markersize=5, markeredgecolor='none', alpha=0.75)
     boxprops = {'linewidth':0.5}
     ax[2].boxplot(results['n_samples'].T, patch_artist=False, 
-                  boxplops=boxprops, flierprops=flierprops)
-    meanlineprops = dict(linestyle='-', linewidth=0.75, alpha=0.75, color='C0')
+                  boxprops=boxprops, flierprops=flierprops)
+    meanprops = {'linewidth':1, 
+                'color':'C3',
+                'alpha':0.75
+                }
     ax[1].boxplot(results['means'].T, patch_artist=False,
-                  boxplops=boxprops, flierprops=flierprops, 
-                  meanprops=meanlineprops, meanline=True)
-    ax[1].axhline(true_mean, alpha=0.75, color='C3', linestyle='--', label='true mean')
+                  boxprops=boxprops, flierprops=flierprops, 
+                  meanprops=meanprops, showmeans=True, meanline=True)
+    ax[1].axhline(true_mean, alpha=0.75, color='C0', linestyle='-', linewidth=1, label='true mean')
     # ax[0].plot(results['means'].var(1), label='variance of means across repeats')
     ax[0].plot(results['vars'].mean(1), alpha=0.75, color='C0', label='analytical derivation')
     ax[0].fill_between(x=np.arange(len(results['vars'].min(1))),
@@ -75,7 +78,7 @@ def plot_bootstrapped_results(true_mean, results, outfile=None, n_tree_ylim=None
 if __name__ == '__main__':
     if "snakemake" not in globals():
         snakemake = mock_snakemake('simulate_sample_design',
-                                   gps_error_type='uniform',
+                                   gps_error_type='rough',
                                    radius_measure=15,
                                    sample_design='PPSWR-SRSWR')
     
@@ -158,6 +161,7 @@ if __name__ == '__main__':
     results = get_bootsrapped_results(sampler, n_min=n_samples_min, ns=n_samples_inc, n_repeats=n_repeats)
     np.savez(snakemake.output.results, **results)
 
+    # results = dict(np.load('../results/' + f'{gps_error_type}/results_rad{radius_measure}_SRS.npz', allow_pickle=True))
     # plot results
     plot_bootstrapped_results(true_mean=tree_bm.mean(), results=results, 
                                 outfile=snakemake.output.fig, n_tree_ylim=None)

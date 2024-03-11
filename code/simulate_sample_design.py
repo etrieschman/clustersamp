@@ -38,9 +38,15 @@ def get_bootsrapped_results(sampler:Sample, n_min=2, ns=100, n_repeats=500):
 def plot_bootstrapped_results(true_mean, results, outfile=None, n_tree_ylim=None):
     # plot
     fig, ax = plt.subplots(nrows=3, sharex=True, figsize=(6, 8))
-    ax[2].boxplot(results['n_samples'].T, patch_artist=False, showfliers=False, boxprops={'linewidth':0.5})
-    ax[1].boxplot(results['means'].T, patch_artist=False, boxprops={'linewidth':0.5})
-    ax[1].axhline(true_mean, alpha=0.7, linestyle='--', label='true mean')
+    flierprops = dict(marker='.', markerfacecolor='grey', markersize=1, markeredgecolor='none', alpha=0.5)
+    boxprops = {'linewidth':0.5}
+    ax[2].boxplot(results['n_samples'].T, patch_artist=False, 
+                  boxplops=boxprops, flierprops=flierprops)
+    meanlineprops = dict(linestyle='-', linewidth=0.75, alpha=0.75, color='C0')
+    ax[1].boxplot(results['means'].T, patch_artist=False,
+                  boxplops=boxprops, flierprops=flierprops, 
+                  meanprops=meanlineprops, meanline=True)
+    ax[1].axhline(true_mean, alpha=0.75, color='C3', linestyle='--', label='true mean')
     # ax[0].plot(results['means'].var(1), label='variance of means across repeats')
     ax[0].plot(results['vars'].mean(1), alpha=0.75, color='C0', label='analytical derivation')
     ax[0].fill_between(x=np.arange(len(results['vars'].min(1))),

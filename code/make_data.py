@@ -104,7 +104,10 @@ def plot_trees(tree_locs, cluster_locs, outfile=None):
 
 if __name__ == '__main__':
     if "snakemake" not in globals():
-        snakemake = mock_snakemake('make_data')
+        snakemake = mock_snakemake('make_data',
+                                   gps_error_type='gaussian',
+                                   radius_measure=15,
+                                   sample_design='PPSWR-SRSWR')
     
     take_subsample = snakemake.params.take_subsample
     radius_gps = int(snakemake.params.radius_gps)

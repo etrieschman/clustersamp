@@ -1,21 +1,21 @@
 \begin{tabular}{l|r|rrr|r|rrr}
 \toprule
-GPS noise type & \multicolumn{2}{r}{gaussian} & uniform \\
-Measurement radius & 10 & 15 & 15 \\
-Design & PPSWR & PPSWR & PPSWR \\
+GPS noise type & \multicolumn{4}{r}{gaussian} & \multicolumn{4}{r}{uniform} \\
+Measurement radius &  & 10 & 15 & 20 &  & 10 & 15 & 20 \\
+Design & SRS & PPSWR & PPSWR & PPSWR & SRS & PPSWR & PPSWR & PPSWR \\
 \midrule
-\textbf{True mean} &  0.55685 &  0.55685 &  0.55685 \\
-\textbf{Estimator mean} & 0.54992 & 0.56428 & 0.55386 \\
-\textbf{Estimator variance} & 0.00477 & 0.00389 & 0.00530 \\
-\textbf{N} & 107 & 107 & 107 \\
-\textbf{n primary units} & 25 & 25 & 25 \\
-\textbf{t-test of estimator mean (vs. True)} & 0.32611 & 0.2942 & 0.68403 \\
-\textbf{Mean of repeat t-tests (vs. True)} & 0.45321 & 0.43908 & 0.45479 \\
-\textbf{Two-sample t-test (vs. SRS)} & 0.0287** & 0.31182 & 0.16522 \\
-\textbf{Mean of two-sample t-tests (vs. SRS)} & - & - & - \\
-\textbf{E[M]} & 71.62814 & 88.97264 & 475.79446 \\
-\textbf{Mean n secondary units} & 67.92000 & 121.89000 & 125.45000 \\
-\textbf{     per primary unit} & 2.71680 & 4.87560 & 5.01800 \\
-\textbf{$P(i \in C_i)$} & 0.39571 & 0.39633 & 1.00023 \\
+\textbf{True mean} &  0.55685 &  0.55685 &  0.55685 &  0.55685 &  0.55685 &  0.55685 &  0.55685 &  0.55685 \\
+\textbf{Estimator mean} & 0.55344 & 0.55134 & 0.55054 & 0.55064 & 0.55488 & 0.55498 & 0.55823 & 0.55590 \\
+\textbf{Estimator variance} & 0.00317 & 0.00491 & 0.00379 & 0.00343 & 0.00324 & 0.00551 & 0.00520 & 0.00505 \\
+\textbf{N} & 107 & 107 & 107 & 107 & 107 & 107 & 107 & 107 \\
+\textbf{n primary units} & 25 & 25 & 25 & 25 & 25 & 25 & 25 & 25 \\
+\textbf{t-test of mean estimator (vs. True)} & 0.17796 & - & - & - & 0.44957 & - & - & - \\
+\textbf{Mean of repeat t-tests (vs. True)} & 0.50116 & 0.46968 & 0.50416 & 0.49459 & 0.48607 & 0.49287 & 0.48019 & 0.46871 \\
+\textbf{t-test of estimator mean (vs. True)} & - & 0.093461 & 0.017957** & 0.016532** & - & 0.57158 & 0.66927 & 0.77684 \\
+\textbf{Two-sample t-test (vs. SRS)} & - & 0.61199 & 0.044931** & 0.066216 & - & 0.98028 & 0.49452 & 0.75429 \\
+\textbf{E[M]} & - & 71.62899 & 88.99177 & 104.65854 & - & 263.57646 & 475.85501 & 752.74290 \\
+\textbf{Mean n secondary units} & - & 67.21800 & 122.58400 & 193.47600 & - & 69.91000 & 127.74000 & 200.46200 \\
+\textbf{     per primary unit} & - & 2.68872 & 4.90336 & 7.73904 & - & 2.79640 & 5.10960 & 8.01848 \\
+\textbf{$P(i \in C_i)$} & - & 0.39571 & 0.39633 & 0.39633 & - & 1.00017 & 1.00051 & 1.00072 \\
 \bottomrule
 \end{tabular}

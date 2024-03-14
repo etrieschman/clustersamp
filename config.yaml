@@ -1,18 +1,20 @@
 take_subsample: 'false' # 'false', or an integer reflecting the subsample to take
 radius_gps: 5
 radius_measure: [20, 15, 10]
-gps_error_type: ['uniform'] #'gaussian', 'uniform', 'rough'
+gps_error_type: ['rough', 'gaussian', 'uniform'] #'gaussian', 'uniform', 'rough'
 
 sample_design: ['SRS', 'PPSWR-SRSWR']
-bootstraps_for_variance: 50
+bootstraps_for_variance: 100
 
 n_samples_min: 10
 n_samples_inc: 75
-n_repeats: 100
+n_repeats: 500
 
-ip_epsabs: 1e-04
-ip_epsrel: 5e-04
-ip_limit: 25
-# ip_epsabs: 1e-01
-# ip_epsrel: 5e-01
-# ip_limit: 4
+## for gaussian
+# ip_epsabs: 1e-04
+# ip_epsrel: 5e-04
+# ip_limit: 25
+# for uniform
+ip_epsabs: 1e-01
+ip_epsrel: 5e-01
+ip_limit: 10

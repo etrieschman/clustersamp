@@ -1,7 +1,9 @@
 # %%
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 from tqdm import tqdm
+from scipy.stats import norm
 
 from sample import Sample, SRS, PPSWR_SRS
 from utils import mock_snakemake
@@ -35,7 +37,7 @@ def get_bootsrapped_results(sampler:Sample, n_min=2, ns=100, n_repeats=500):
 
     return results
 
-def plot_bootstrapped_results(true_mean, results, outfile=None, n_tree_ylim=None):
+def plot_bootstrapped_results(true_mean, results, outfile=None, alpha=0.05, n_tree_ylim=None):
     # plot
     fig, ax = plt.subplots(nrows=3, sharex=True, figsize=(6, 8))
     flierprops = dict(marker='.', markerfacecolor='grey', markersize=5, markeredgecolor='none', alpha=0.75)
@@ -49,14 +51,20 @@ def plot_bootstrapped_results(true_mean, results, outfile=None, n_tree_ylim=None
     ax[1].boxplot(results['means'].T, patch_artist=False,
                   boxprops=boxprops, flierprops=flierprops, 
                   meanprops=meanprops, showmeans=True, meanline=True)
+    # add true mean
     ax[1].axhline(true_mean, alpha=0.75, color='C0', linestyle='-', linewidth=1, label='true mean')
     # ax[0].plot(results['means'].var(1), label='variance of means across repeats')
+    zscore = norm.ppf(1 - alpha/2)
     ax[0].plot(results['vars'].mean(1), alpha=0.75, color='C0', label='analytical derivation')
-    ax[0].fill_between(x=np.arange(len(results['vars'].min(1))),
-                        y1=results['vars'].min(1), y2=results['vars'].max(1), alpha=0.15, color='C0')
+    ax[0].fill_between(x=np.arange(len(results['vars'].mean(1))),
+                       y1=results['vars'].min(1),
+                       y2=results['vars'].max(1),
+                       alpha=0.15, color='C0')
     ax[0].plot(results['vars_boot'].mean(1), alpha=0.75, color='C1', label='bootstrapped estimation')
-    ax[0].fill_between(x=np.arange(len(results['vars_boot'].min(1))),
-                        y1=results['vars_boot'].min(1), y2=results['vars'].max(1), alpha=0.15, color='C1', label='range (min-max)')
+    ax[0].fill_between(x=np.arange(len(results['vars_boot'].mean(1))),
+                       y1=results['vars_boot'].min(1), 
+                       y2=results['vars_boot'].max(1),
+                       alpha=0.15, color='C1', label=f'range (min-max)')
     ax[2].set_xticks(
         np.arange(results['params']['ns'], step=10), 
         np.arange(results['params']['n_min'], 
@@ -67,8 +75,12 @@ def plot_bootstrapped_results(true_mean, results, outfile=None, n_tree_ylim=None
     if n_tree_ylim is not None:
         ax[2].set_ylim(n_tree_ylim)
     ax[0].set_ylabel('estimator variance')
-    ax[1].legend()
-    ax[0].legend()
+    # add lines just for legend
+    h_sample_med = mlines.Line2D([], [], color='C1', marker=None, linestyle='--', linewidth=1, label='sample mean median')
+    h_sample_mean = mlines.Line2D([], [], color='C3', marker=None, linestyle='--', linewidth=1, label='sample mean mean')
+    h_true_mean = mlines.Line2D([], [], color='C0', marker=None, linestyle='-', linewidth=1, label='true mean')
+    ax[1].legend(handles=[h_true_mean, h_sample_med, h_sample_mean], frameon=False)
+    ax[0].legend(frameon=False)
     if outfile is not None:
         plt.savefig(outfile, bbox_inches='tight')
     else:

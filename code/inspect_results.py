@@ -12,11 +12,10 @@ PATH_DATA = '../data/'
 
 # set conditions
 radius_gps = 5
-radius_measures = [15, 10, 5]
+radius_measures = [20, 15, 10]
 sample_designs = ['PPSWR-SRSWR', 'SRS']
 gps_error_types = ['uniform', 'gaussian']
 ns = [25, 45, 65]
-ns = [25, 45]
 
 # helper functions
 def get_mean_pvalue(results, nindex, true_mean):
@@ -61,7 +60,7 @@ for n in ns:
                 't-test of estimator mean (vs. True)':ttest,
                 'Mean of repeat t-tests (vs. True)':get_mean_pvalue(results_pps, nindex, tree_bm.mean()),
                 'Two-sample t-test (vs. SRS)':ttest2samp,
-                'Mean of two-sample t-tests (vs. SRS)':None,
+                # 'Mean of two-sample t-tests (vs. SRS)':None,
                 'E[M]':f'{EM.copy():0.5f}',
                 'Mean n secondary units':f"{results_pps['n_samples'][nindex].mean():0.5f}",
                 '     per primary unit': f"{results_pps['n_samples'][nindex].mean()/n:0.5f}",
@@ -80,7 +79,7 @@ for n in ns:
                 ttest = f"{ttest[1]:0.5}{'**' if ttest[1] < 0.05 else ''}"
                 summiter_srs = {
                     'True mean':f'{tree_bm.mean(): 0.5f}',
-                    'Estimator':f"{results_srs['means'][nindex].mean():0.5f}",
+                    'Estimator mean':f"{results_srs['means'][nindex].mean():0.5f}",
                     'Estimator variance':f"{results_srs['vars'][nindex].mean():0.5f}",
                     'N':str(N),
                     'n primary units':str(n),

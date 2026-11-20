@@ -1,9 +1,13 @@
-venv*
 __pycache__/
-*__pycache__/
-.snakemake/
-logs*
-*.DS_Store
-# regenerable in a few minutes from the seed in config.yaml (about 150MB)
-results/**/*.npz
-resources/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.DS_Store
+dist/
+build/
+*.egg-info/
+notebooks/figures/
+notebooks/tables/
+.env

@@ -4,3 +4,6 @@ __pycache__/
 .snakemake/
 logs*
 *.DS_Store
+# regenerable in a few minutes from the seed in config.yaml (about 150MB)
+results/**/*.npz
+resources/

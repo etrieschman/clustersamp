@@ -20,7 +20,7 @@ for gps_error_type in ['gaussian', 'uniform']:
         # readin data and get inclusion probabilities
         infile = f'{parent_dir}/data/raw/wt_kentland_data.csv'
         tree_locs, cluster_locs, tree_bm = get_real_tree_data(infile, gps_error_type, radius_gps)
-        inc_probs = np.loadtxt(f'{parent_dir}/resources/{gps_error_type}/ip_rad{radius_measurement}.txt', delimiter=',')
+        inc_probs = np.loadtxt(f'{parent_dir}/resources/kentland/{gps_error_type}/ip_rad{radius_measurement}.txt', delimiter=',')
         N = len(tree_bm)
         ENis = inc_probs.sum(axis=1)
         EM = ENis.sum()

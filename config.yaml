@@ -1,20 +1,22 @@
 take_subsample: 'false' # 'false', or an integer reflecting the subsample to take
-radius_gps: 5
-radius_measure: [20, 15, 10]
-gps_error_type: ['rough', 'gaussian', 'uniform'] #'gaussian', 'uniform', 'rough'
+seed: 20240311
 
-sample_design: ['SRS', 'PPSWR-SRSWR']
+population: ['kentland', 'synthetic'] # 'kentland' (real trees), 'synthetic' (size falls with local density)
+gps_error_type: ['gaussian', 'uniform']
+gps_error: # meters
+  gaussian: 2.5 # standard deviation of each coordinate
+  uniform: 5 # radius of the error disc
+radius_measure: [20, 15, 10]
+radius_measure_expected: [20, 15, 10, 6] # 6 is too small for the errors above; shows the coverage condition
+
+# SRS: tagged trees (benchmark). PPSWR-SRSWR: the 2024 design. PIN-*: the pin-count design
+# HH/RATIO: Hansen-Hurwitz or ratio form. 1TREE: locate every tree in the plot, measure biomass on one
+sample_design: ['SRS', 'PPSWR-SRSWR', 'PIN-HH', 'PIN-RATIO', 'PIN-HH-1TREE', 'PIN-RATIO-1TREE']
 bootstraps_for_variance: 100
 
 n_samples_min: 10
 n_samples_inc: 75
 n_repeats: 500
 
-## for gaussian
-# ip_epsabs: 1e-04
-# ip_epsrel: 5e-04
-# ip_limit: 25
-# for uniform
-ip_epsabs: 1e-01
-ip_epsrel: 5e-01
-ip_limit: 10
+# for expected values by enumeration
+n_error_draws: 1000

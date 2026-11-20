@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from pyproj import Transformer
+from scipy.spatial import cKDTree
 from utils import mock_snakemake
 
 PATH_DATA = 'data/'
@@ -24,7 +25,9 @@ def latlon_to_utm(lat, lon):
 
 
 # READ IN ACTUAL DATA
-def get_real_tree_data(infile, gps_error_type, radius_gps):
+# the recorded phone locations are the pins (primary units); the "true" tree
+# locations are the pins perturbed by one draw of GPS error
+def get_real_tree_data(infile, gps_error_type, gps_error):
     # readin dataset
     treedf = pd.read_csv(infile, header=0)
     cluster_loc_lat = treedf.lat.values
@@ -34,52 +37,62 @@ def get_real_tree_data(infile, gps_error_type, radius_gps):
     # convert to equal-area
     cluster_loc_x, cluster_loc_y = latlon_to_utm(cluster_loc_lat, cluster_loc_lon)
     cluster_locs = np.array([cluster_loc_x, cluster_loc_y]).T
-    if gps_error_type == 'gaussian':
-        tree_locs = record_noisy_gps_locs_gaus(cluster_locs, radius_gps)
-    else:
-        tree_locs = record_noisy_gps_locs_unif(cluster_locs, radius_gps)
+    tree_locs = record_noisy_gps_locs(cluster_locs, gps_error_type, gps_error)
 
     return tree_locs, cluster_locs, tree_bm
 
 
-# GENERATE TREE LOCATIONS FROM A MIXTURE OF GAUSSIANS
-# use mixture to simulate clustering/bunching of trees
-def get_random_tree_locs(n_trees, n_groups=10, std_scale=0.5):
-    # Define the parameters for each Gaussian component
-    means = np.random.normal(size=n_groups*2).reshape((n_groups, 2))  # Mean of each component
-    std_devs = np.ones(n_groups) * std_scale  # Standard deviation of each component
-    mixing_coeffs = np.ones(n_groups) / n_groups  # Mixing coefficients (weights)
-    # Initialize an array to store the generated data points
-    tree_locs = np.zeros((n_trees, 2))
+# GENERATE SYNTHETIC TREE LOCATIONS
+# several small stands with different planting densities, so there is a lot of
+# stand edge and local density varies at the scale of a measurement plot
+def get_random_tree_locs(n_stands=5, stand_size=(40, 90), area_per_tree=(25, 60), min_spacing=2):
+    stand_corners = np.array([(0, 0), (150, 20), (40, 160), (220, 180), (300, 60)])[:n_stands]
+    tree_locs = []
+    for corner in stand_corners:
+        width, height = np.random.uniform(*stand_size, size=2)
+        n_trees = int(width * height / np.random.uniform(*area_per_tree))
+        tree_locs += [corner + np.random.uniform(size=(n_trees, 2)) * [width, height]]
+    tree_locs = np.vstack(tree_locs)
 
-    # Generate data points from the mixture
-    for i in range(n_trees):
-        # Randomly select a Gaussian component based on mixing coefficients
-        group_idx = np.random.choice(n_groups, p=mixing_coeffs)
-        # Generate a random data point from the selected component
-        sample = np.random.normal(loc=means[group_idx], scale=std_devs[group_idx])
-        # Append the sample to the data_points array
-        tree_locs[i] = sample
-    
-    return tree_locs
+    # drop one tree of every pair closer than the minimum spacing
+    keep = np.ones(len(tree_locs), dtype=bool)
+    for i, j in sorted(cKDTree(tree_locs).query_pairs(min_spacing)):
+        if keep[i] and keep[j]:
+            keep[j] = False
+    return tree_locs[keep]
 
 # ASSIGN BIOMASS TO TREES
-def get_random_tree_bm(tree_locs, gamma_shape=3, gamma_scale=2, loc_corr=0.5, loc_corr_noise_std=0.025):
-    # get gamma distributed biomass
-    tree_bm = np.random.gamma(shape=gamma_shape, scale=gamma_scale, size=len(tree_locs))
-    # include correlation with lat/lon, and some noise
-    tree_bm += (tree_locs[:,0]*loc_corr + 
-                tree_locs[:,1]*loc_corr + 
-                np.random.normal(scale=loc_corr_noise_std, size=len(tree_locs)))
-    return tree_bm
+# biomass falls with the number of neighbors (competition), so tree size is
+# correlated with local density; this is the case the 2024 design gets wrong
+def get_random_tree_bm(tree_locs, gamma_shape=6, mean_bm=0.5, competition=0.35, competition_rad=8):
+    tree_bm = np.random.gamma(shape=gamma_shape, scale=mean_bm/gamma_shape, size=len(tree_locs))
+    n_neighbors = cKDTree(tree_locs).query_ball_point(tree_locs, competition_rad, return_length=True) - 1
+    n_neighbors_std = (n_neighbors - n_neighbors.mean()) / n_neighbors.std()
+    return tree_bm * np.exp(-competition * n_neighbors_std)
+
+def get_synthetic_tree_data(gps_error_type, gps_error):
+    tree_locs = get_random_tree_locs()
+    tree_bm = get_random_tree_bm(tree_locs)
+    # every tree gets one pin at planting
+    cluster_locs = record_noisy_gps_locs(tree_locs, gps_error_type, gps_error)
+    return tree_locs, cluster_locs, tree_bm
+
+# PATCHY MORTALITY
+# dead trees leave no trace in the field; their pins stay in the frame
+def get_patchy_mortality(tree_locs, n_patches=12, patch_rad=15, max_mortality=0.7):
+    lo, hi = tree_locs.min(0), tree_locs.max(0)
+    patch_locs = np.random.uniform(lo, hi, size=(n_patches, 2))
+    dist = np.linalg.norm(tree_locs[:, np.newaxis] - patch_locs[np.newaxis], axis=2).min(1)
+    alive = np.random.uniform(size=len(tree_locs)) > max_mortality * np.exp(-(dist / patch_rad)**2)
+    return alive
+
 
 # RECORD NOISY LOCATIONS (THESE BECOME OUR CLUSTER AND DEPLOYED MEASUREMENT LOCATIONS)
+# gaussian: gps_noise is the standard deviation of each coordinate (m)
 def record_noisy_gps_locs_gaus(tree_locs, gps_noise):
-    cluster_locs = np.zeros(tree_locs.shape)
-    for i, tree in enumerate(tree_locs):
-        cluster_locs[i] = np.random.multivariate_normal(mean=tree, cov=np.identity(2)*gps_noise)
-    return cluster_locs
+    return tree_locs + np.random.normal(scale=gps_noise, size=tree_locs.shape)
 
+# uniform: radius is the radius of the error disc (m)
 def record_noisy_gps_locs_unif(tree_locs, radius):
     cluster_locs = np.zeros(tree_locs.shape)
     r = radius * np.sqrt(np.random.uniform(0, 1, size=len(tree_locs)))
@@ -87,17 +100,25 @@ def record_noisy_gps_locs_unif(tree_locs, radius):
 
     cluster_locs[:,0] = tree_locs[:,0] + r * np.cos(theta)
     cluster_locs[:,1] = tree_locs[:,1] + r * np.sin(theta)
-    
+
     return cluster_locs
 
-def plot_trees(tree_locs, cluster_locs, outfile=None):
+def record_noisy_gps_locs(tree_locs, gps_error_type, gps_error):
+    if gps_error_type == 'gaussian':
+        return record_noisy_gps_locs_gaus(tree_locs, gps_error)
+    elif gps_error_type == 'uniform':
+        return record_noisy_gps_locs_unif(tree_locs, gps_error)
+    raise ValueError(f'unknown gps_error_type: {gps_error_type}')
+
+def plot_trees(tree_locs, cluster_locs, tree_bm, outfile=None):
     plt.figure(figsize=(6,6))
-    plt.scatter(x=tree_locs[:,0], y=tree_locs[:,1], alpha=0.5, s=tree_bm*100, label='[secondary unit] true tree location (and size)')
-    plt.scatter(x=cluster_locs[:,0], y=cluster_locs[:,1], alpha=0.5, s=8, label='[primary unit] noisy GPS tree location')
+    plt.scatter(x=tree_locs[:,0], y=tree_locs[:,1], alpha=0.5, s=tree_bm*100, label='true tree location (and size)')
+    plt.scatter(x=cluster_locs[:,0], y=cluster_locs[:,1], alpha=0.5, s=8, label='[primary unit] noisy GPS pin')
     plt.legend()
+    plt.axis('equal')
     plt.xlabel('easting')
     plt.ylabel('northing')
-    plt.title('Primary and secondary unit locations')
+    plt.title('Pin and tree locations')
     if outfile is not None:
         plt.savefig(outfile, dpi=300)
 
@@ -105,17 +126,21 @@ def plot_trees(tree_locs, cluster_locs, outfile=None):
 if __name__ == '__main__':
     if "snakemake" not in globals():
         snakemake = mock_snakemake('make_data',
-                                   gps_error_type='gaussian',
-                                   radius_measure=15,
-                                   sample_design='PPSWR-SRSWR')
-    
+                                   population='synthetic',
+                                   gps_error_type='gaussian')
+
     take_subsample = snakemake.params.take_subsample
-    radius_gps = int(snakemake.params.radius_gps)
+    population = snakemake.wildcards.population
     gps_error_type = snakemake.wildcards.gps_error_type
+    gps_error = float(snakemake.params.gps_error[gps_error_type])
     infile = snakemake.input.raw_data
+    np.random.seed(int(snakemake.params.seed))
 
     # get data
-    tree_locs, cluster_locs, tree_bm = get_real_tree_data(infile, gps_error_type, radius_gps)
+    if population == 'kentland':
+        tree_locs, cluster_locs, tree_bm = get_real_tree_data(infile, gps_error_type, gps_error)
+    elif population == 'synthetic':
+        tree_locs, cluster_locs, tree_bm = get_synthetic_tree_data(gps_error_type, gps_error)
 
     if take_subsample != 'false':
         tree_locs, cluster_locs, tree_bm = tree_locs[:int(take_subsample)], cluster_locs[:int(take_subsample)], tree_bm[:int(take_subsample)]
@@ -126,5 +151,5 @@ if __name__ == '__main__':
     np.savetxt(snakemake.output.tree_bm, tree_bm, delimiter=',')
 
     # plot trees
-    plot_trees(tree_locs, cluster_locs, snakemake.output.fig)
+    plot_trees(tree_locs, cluster_locs, tree_bm, snakemake.output.fig)
 # %%

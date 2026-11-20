@@ -11,8 +11,8 @@ State on 2026-11-20. The estimator, its proofs and the simulations exist as a fi
 Check, before the note goes to anyone:
 
 1. The proofs. Theorem 1 and Propositions 1 to 5 were derived in one sitting and checked only by simulation and by `test_exact_given_a_common_error`. Get a survey statistician to read Section 4 of the note.
-2. The citations. `bib.bib` entries added in November 2026 came from a web search. The note's `\todo{}` lines say which were confirmed. Read the three closest papers in full before claiming novelty: Bouriaud et al. 2024, Chauvet et al. 2023, Lavallée and Caron 2001.
-3. The VM0047 v1.1 section numbers and wording, against the PDF.
+2. The closest prior work. Read Bouriaud et al. 2024, Chauvet et al. 2023 and Lavallée and Caron 2001 in full before claiming novelty; so far only their abstracts and metadata have been checked. The bibliography was checked against Crossref or the documents on 2026-11-20; `bib.bib` marks the open points (Gregoire and Valentine's year, two abstracts not opened).
+3. The VM0047 v1.1 wording. Section and equation numbers are confirmed (§4.3 items 6 and 7, §8.3.1.1 Eq. 24, §8.5.2 Eq. 29 to 31, §9.2). The note paraphrases; copy exact wording from the PDF where it quotes.
 
 Decide:
 
